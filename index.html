@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>thinkur | Voice Dictation for Mac</title>
+    <title>thinkur | Voice Interface for Mac</title>
     <meta
       name="description"
-      content="thinkur for macOS: private voice dictation with on-device processing. $29 one-time. No account."
+      content="thinkur for macOS. Think your thoughts. Interface with your machine through voice. On-device, no account, £29 one-time."
     />
-    <meta name="theme-color" content="#0c1118" />
+    <meta name="theme-color" content="#090909" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -25,7 +25,7 @@
           <span>thinkur</span>
         </a>
 
-        <a class="button button-primary" href="#download">Download for Mac - $29</a>
+        <a class="button button-primary" href="#download">Download for Mac - £29</a>
       </nav>
     </header>
 
@@ -34,149 +34,170 @@
         <div class="hero-layout">
           <div class="hero-copy">
             <p class="kicker">macOS only</p>
-            <h1>Speak once. Clean text appears.</h1>
-            <p class="lead">Fast dictation. On-device privacy. No account.</p>
+            <h1>Think your thoughts. Interface with your machine through voice.</h1>
+            <p class="lead">
+              Instant processing. No cloud lag. No account. Clean text appears at your cursor in every app.
+            </p>
 
             <div class="price-line">
-              <p class="price">$29 one-time</p>
-              <p class="anchor"><span class="strike">$180/yr</span> typical subscription alternative</p>
+              <p class="price">£29 one-time</p>
+              <p class="anchor"><span class="strike">£180/yr</span> typical cloud subscription</p>
             </div>
 
-            <ul class="checklist">
-              <li>Own your data. Voice never leaves your Mac.</li>
-              <li>Instant and reliable, like top cloud tools.</li>
-              <li>4x faster than typing in normal work.</li>
-              <li>Works in every app with a text cursor.</li>
-              <li>Own the software forever.</li>
+            <ul class="checklist" aria-label="Core value points">
+              <li>Faster than cloud alternatives that charge monthly.</li>
+              <li>Post-processing runs on-device. Use it offline.</li>
+              <li>Your data stays on your Mac.</li>
+              <li>No account needed.</li>
+              <li>4x faster than typing.</li>
+              <li>Beautifully designed for daily use.</li>
+              <li>Buy once. Own forever.</li>
             </ul>
 
             <div class="hero-actions">
               <a class="button button-primary button-large" href="#download">Download now</a>
-              <p class="micro">Requires macOS 13+. No subscription.</p>
+              <p class="micro">Requires macOS 13.0+. No subscription.</p>
             </div>
           </div>
 
-          <aside class="hero-demo">
+          <aside class="hero-demo" aria-labelledby="demo-title">
             <div class="demo-head">
-              <img src="./assets/thinkur-icon.png" alt="thinkur mark" width="20" height="20" />
-              <p id="demo-context">Terminal</p>
+              <p class="demo-kicker" id="demo-title">Live app preview</p>
+              <p class="demo-sub">Click tabs to switch context.</p>
             </div>
 
-            <div class="demo-block">
-              <p class="demo-label">you said</p>
-              <p id="demo-raw" class="demo-raw">um can you check the deploy status then restart the worker</p>
+            <div class="demo-tabs" role="tablist" aria-label="Preview contexts">
+              <button type="button" class="demo-tab is-active" data-demo-key="terminal" role="tab" aria-selected="true">
+                <img src="./assets/icons/terminal.png" alt="" width="14" height="14" />
+                Terminal
+              </button>
+              <button type="button" class="demo-tab" data-demo-key="firefox" role="tab" aria-selected="false">
+                <img src="./assets/icons/firefox.png" alt="" width="14" height="14" />
+                Firefox
+              </button>
+              <button type="button" class="demo-tab" data-demo-key="messages" role="tab" aria-selected="false">
+                <img src="./assets/icons/messages.png" alt="" width="14" height="14" />
+                Messages
+              </button>
+              <button type="button" class="demo-tab" data-demo-key="slack" role="tab" aria-selected="false">
+                <img src="./assets/icons/slack.png" alt="" width="14" height="14" />
+                Slack
+              </button>
+              <button type="button" class="demo-tab" data-demo-key="notes" role="tab" aria-selected="false">
+                <img src="./assets/icons/notes.png" alt="" width="14" height="14" />
+                Notes
+              </button>
             </div>
 
-            <div class="demo-arrow" aria-hidden="true">&#8595;</div>
-
-            <div class="demo-block demo-block-clean">
-              <p class="demo-label">you wrote</p>
-              <p id="demo-clean" class="demo-clean">Can you check the deploy status, then restart the worker?</p>
-            </div>
-
-            <div class="demo-tabs" role="tablist" aria-label="Demo contexts">
-              <button type="button" data-demo-key="terminal" class="is-active">Terminal</button>
-              <button type="button" data-demo-key="firefox">Firefox</button>
-              <button type="button" data-demo-key="messages">Messages</button>
-              <button type="button" data-demo-key="slack">Slack</button>
-              <button type="button" data-demo-key="notes">Notes</button>
-            </div>
+            <div class="demo-window" id="app-preview" aria-live="polite"></div>
           </aside>
         </div>
       </section>
 
-      <section class="section section-steps">
-        <p class="kicker">Onboarding</p>
-        <h2>Five short steps. Done once.</h2>
+      <section class="section section-apps" aria-labelledby="apps-title">
+        <div class="section-head">
+          <p class="kicker">coverage</p>
+          <h2 id="apps-title">Works in every app you already use.</h2>
+        </div>
 
-        <ol class="step-track">
-          <li>
-            <span>1</span>
-            <p>Permissions</p>
-          </li>
-          <li>
-            <span>2</span>
-            <p>Model + Value</p>
-          </li>
-          <li>
-            <span>3</span>
-            <p>Quick Settings</p>
-          </li>
-          <li>
-            <span>4</span>
-            <p>Try It</p>
-          </li>
-          <li>
-            <span>5</span>
-            <p>Activate</p>
-          </li>
-        </ol>
+        <div class="app-grid">
+          <div class="app-chip"><img src="./assets/icons/terminal.png" alt="" width="20" height="20" /><span>Terminal</span></div>
+          <div class="app-chip"><img src="./assets/icons/firefox.png" alt="" width="20" height="20" /><span>Firefox</span></div>
+          <div class="app-chip"><img src="./assets/icons/messages.png" alt="" width="20" height="20" /><span>Messages</span></div>
+          <div class="app-chip"><img src="./assets/icons/slack.png" alt="" width="20" height="20" /><span>Slack</span></div>
+          <div class="app-chip"><img src="./assets/icons/notes.png" alt="" width="20" height="20" /><span>Notes</span></div>
+          <div class="app-chip"><img src="./assets/icons/mail.png" alt="" width="20" height="20" /><span>Mail</span></div>
+          <div class="app-chip"><img src="./assets/icons/gmail.svg" alt="" width="20" height="20" /><span>Gmail</span></div>
+          <div class="app-chip"><img src="./assets/icons/googledocs.svg" alt="" width="20" height="20" /><span>Docs</span></div>
+          <div class="app-chip"><img src="./assets/icons/notion.svg" alt="" width="20" height="20" /><span>Notion</span></div>
+          <div class="app-chip"><img src="./assets/icons/cursor.png" alt="" width="20" height="20" /><span>Cursor</span></div>
+          <div class="app-chip"><img src="./assets/icons/vscode.png" alt="" width="20" height="20" /><span>VS Code</span></div>
+          <div class="app-chip"><img src="./assets/icons/xcode.png" alt="" width="20" height="20" /><span>Xcode</span></div>
+        </div>
       </section>
 
-      <section class="section section-proof">
-        <article class="proof-card">
-          <p class="proof-kicker">Private by design</p>
-          <h3>On-device. No cloud transcript.</h3>
-          <ul>
-            <li>WhisperKit + rules-based post-processing</li>
-            <li>No account needed for core use</li>
-            <li>Offline dictation supported</li>
-          </ul>
-        </article>
+      <section class="section section-intelligence" aria-labelledby="intelligence-title">
+        <div class="section-head">
+          <p class="kicker">intelligence + privacy</p>
+          <h2 id="intelligence-title">Cloud transcripts leave your Mac. thinkur does post-processing locally.</h2>
+        </div>
 
-        <article class="proof-card proof-card-apps">
-          <p class="proof-kicker">Coverage</p>
-          <h3>Works in every app you already use.</h3>
-          <div class="app-cloud">
-            <span>Terminal</span>
-            <span>Firefox</span>
-            <span>Messages</span>
-            <span>Slack</span>
-            <span>Notes</span>
-            <span>Gmail</span>
-            <span>Docs</span>
-            <span>Notion</span>
-            <span>Cursor</span>
-            <span>VS Code</span>
-            <span>Apple Mail</span>
-            <span>Xcode</span>
-          </div>
-        </article>
+        <div class="intel-layout">
+          <article class="compare-card" aria-label="Cloud versus thinkur comparison">
+            <div class="compare-head compare-grid">
+              <p>Criteria</p>
+              <p>Cloud models</p>
+              <p>thinkur</p>
+            </div>
 
-        <article class="proof-card">
-          <p class="proof-kicker">Intelligence</p>
-          <h3>9-stage cleanup in ~2ms.</h3>
-          <div class="pipeline-grid">
-            <span>Self-correction</span>
-            <span>Filler removal</span>
-            <span>Spoken punctuation</span>
-            <span>Smart formatting</span>
-            <span>Pause punctuation</span>
-            <span>Capitalization</span>
-            <span>Style adaptation</span>
-            <span>List detection</span>
-            <span>Code context</span>
-          </div>
-        </article>
+            <div class="compare-row compare-grid">
+              <p>Data path</p>
+              <p>Audio sent to vendor servers</p>
+              <p>Audio stays on your Mac</p>
+            </div>
+            <div class="compare-row compare-grid">
+              <p>Processing</p>
+              <p>Remote AI + network latency</p>
+              <p>Local WhisperKit + rules cleanup</p>
+            </div>
+            <div class="compare-row compare-grid">
+              <p>Account</p>
+              <p>Usually required</p>
+              <p>Not required</p>
+            </div>
+            <div class="compare-row compare-grid">
+              <p>Offline</p>
+              <p>No</p>
+              <p>Yes</p>
+            </div>
+            <div class="compare-row compare-grid">
+              <p>Cost</p>
+              <p>~£180/yr</p>
+              <p>£29 once</p>
+            </div>
+          </article>
+
+          <article class="example-stack" aria-label="Real text cleanup examples">
+            <h3>Real cleanup examples</h3>
+
+            <div class="example-card">
+              <p class="example-label">You said</p>
+              <p class="example-raw">um yeah just ping emily and say we can push the launch to next tuesday afternoon</p>
+              <p class="example-label muted">Cloud transcript</p>
+              <p class="example-mid">um yeah just ping emily and say we can push the launch to next tuesday afternoon</p>
+              <p class="example-label">thinkur output</p>
+              <p class="example-clean">Ping Emily and let her know we can move the launch to Tuesday afternoon.</p>
+            </div>
+
+            <div class="example-card">
+              <p class="example-label">You said</p>
+              <p class="example-raw">okay add bullet one fix rate limit middleware bullet two add tests and send update in slack</p>
+              <p class="example-label muted">Cloud transcript</p>
+              <p class="example-mid">okay add bullet one fix rate limit middleware bullet two add tests and send update in slack</p>
+              <p class="example-label">thinkur output</p>
+              <p class="example-clean">- Fix rate-limit middleware\n- Add tests\n- Post an update in Slack</p>
+            </div>
+          </article>
+        </div>
       </section>
 
-      <section class="section section-value" id="download">
+      <section class="section section-value" id="download" aria-labelledby="value-title">
         <div class="value-layout">
           <div class="value-copy">
-            <p class="kicker">Value demo</p>
-            <h2>See your monthly upside.</h2>
+            <p class="kicker">value demo</p>
+            <h2 id="value-title">Calculate your reclaimed time.</h2>
             <p class="lead">Two inputs. Instant estimate.</p>
 
             <div class="close-cta">
-              <p class="close-line">Download now. Own it forever.</p>
-              <a class="button button-primary button-large" href="#download">Download thinkur for Mac - $29</a>
+              <p class="close-line">Mac only. Download now.</p>
+              <a class="button button-primary button-large" href="#download">Download thinkur for Mac - £29</a>
             </div>
           </div>
 
           <div class="savings-shell">
-            <aside class="savings-result">
+            <aside class="savings-result" aria-live="polite">
               <p class="result-label">Estimated value / month</p>
-              <p class="result-money" id="monthly-savings">$0</p>
+              <p class="result-money" id="monthly-savings">£0</p>
 
               <div class="result-divider" aria-hidden="true"></div>
 
@@ -191,7 +212,7 @@
                 </div>
               </div>
 
-              <p class="result-note">$29 one-time. Keep the upside forever.</p>
+              <p class="result-note">£29 one-time. Keep the upside forever.</p>
             </aside>
 
             <div class="savings-controls">
@@ -204,7 +225,7 @@
               <article class="control-card">
                 <p class="control-title">Your hourly value</p>
                 <label class="money-row" for="hourly-rate">
-                  <span class="money-prefix">$</span>
+                  <span class="money-prefix">£</span>
                   <input id="hourly-rate" type="number" min="1" step="1" value="50" />
                   <span class="money-suffix">/hour</span>
                 </label>
