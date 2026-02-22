@@ -1,337 +1,228 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>thinkur | Voice Dictation, Polished Locally</title>
+    <title>thinkur | Voice Dictation for Mac</title>
     <meta
       name="description"
-      content="thinkur turns messy dictation into polished writing using on-device AI. macOS only. One-time purchase. Zero subscriptions."
+      content="thinkur for macOS: private voice dictation with on-device processing. $29 one-time. No account."
     />
-    <meta name="theme-color" content="#000000" />
-    <link rel="preload" href="./styles.css" as="style" />
+    <meta name="theme-color" content="#0c1118" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="noise-overlay" aria-hidden="true"></div>
-    <div class="aurora aurora-one" aria-hidden="true"></div>
-    <div class="aurora aurora-two" aria-hidden="true"></div>
+    <header class="nav-wrap">
+      <nav class="nav">
+        <a class="brand" href="#top" aria-label="thinkur home">
+          <img src="./assets/thinkur-icon.png" alt="thinkur logo" width="32" height="32" />
+          <span>thinkur</span>
+        </a>
 
-    <header class="site-nav glass-shell">
-      <a class="brand" href="#hero" aria-label="thinkur home">
-        <span class="brand-mark" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-        </span>
-        <span>thinkur</span>
-      </a>
-      <div class="nav-actions">
-        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
-          Light
-        </button>
-        <a
-          class="button button-nav js-cta"
-          data-desktop-label="Get thinkur - $29"
-          data-mobile-label="Send link to my Mac"
-          data-desktop-href="#pricing"
-          href="#pricing"
-          >Get thinkur - $29</a
-        >
-      </div>
+        <a class="button button-primary" href="#download">Download for Mac - $29</a>
+      </nav>
     </header>
 
-    <main>
-      <section class="section section-hero" id="hero">
-        <div class="hero-copy reveal">
-          <p class="eyebrow">Now available for Apple Silicon</p>
-          <h1>Think out loud. The Mac does the rest.</h1>
-          <p class="lead">
-            Press a key, speak your mind, and watch messy thoughts transform into polished,
-            punctuated text. 100% on-device. Zero subscriptions.
-          </p>
-          <div class="hero-actions">
-            <a
-              class="button button-primary button-xl js-cta"
-              data-desktop-label="Download for Mac"
-              data-mobile-label="Send link to my Mac"
-              data-desktop-href="#pricing"
-              href="#pricing"
-              >Download for Mac</a
-            >
-          </div>
-          <p class="micro-copy">Requires macOS 13.0+. One-time $29 purchase.</p>
-        </div>
+    <main id="top">
+      <section class="section section-hero">
+        <div class="hero-layout">
+          <div class="hero-copy">
+            <p class="kicker">macOS only</p>
+            <h1>Speak once. Clean text appears.</h1>
+            <p class="lead">Fast dictation. On-device privacy. No account.</p>
 
-        <div class="hero-visual reveal">
-          <article class="glass-card hero-console">
-            <div class="console-bar">
-              <span class="window-dot"></span>
-              <span class="window-dot"></span>
-              <span class="window-dot"></span>
-              <span class="console-title">Global Dictation Input</span>
-              <span class="console-hotkey">Shift+S</span>
+            <div class="price-line">
+              <p class="price">$29 one-time</p>
+              <p class="anchor"><span class="strike">$180/yr</span> typical subscription alternative</p>
             </div>
-            <div class="console-input-row">
-              <div class="pixel-grid" id="hero-grid" aria-hidden="true"></div>
-              <div class="input-shell">
-                <p class="input-label">Speech to polished text</p>
-                <p class="hero-text" id="hero-text">Press Shift+S and speak...</p>
+
+            <ul class="checklist">
+              <li>Own your data. Voice never leaves your Mac.</li>
+              <li>Instant and reliable, like top cloud tools.</li>
+              <li>4x faster than typing in normal work.</li>
+              <li>Works in every app with a text cursor.</li>
+              <li>Own the software forever.</li>
+            </ul>
+
+            <div class="hero-actions">
+              <a class="button button-primary button-large" href="#download">Download now</a>
+              <p class="micro">Requires macOS 13+. No subscription.</p>
+            </div>
+          </div>
+
+          <aside class="hero-demo">
+            <div class="demo-head">
+              <img src="./assets/thinkur-icon.png" alt="thinkur mark" width="20" height="20" />
+              <p id="demo-context">Terminal</p>
+            </div>
+
+            <div class="demo-block">
+              <p class="demo-label">you said</p>
+              <p id="demo-raw" class="demo-raw">um can you check the deploy status then restart the worker</p>
+            </div>
+
+            <div class="demo-arrow" aria-hidden="true">&#8595;</div>
+
+            <div class="demo-block demo-block-clean">
+              <p class="demo-label">you wrote</p>
+              <p id="demo-clean" class="demo-clean">Can you check the deploy status, then restart the worker?</p>
+            </div>
+
+            <div class="demo-tabs" role="tablist" aria-label="Demo contexts">
+              <button type="button" data-demo-key="terminal" class="is-active">Terminal</button>
+              <button type="button" data-demo-key="firefox">Firefox</button>
+              <button type="button" data-demo-key="messages">Messages</button>
+              <button type="button" data-demo-key="slack">Slack</button>
+              <button type="button" data-demo-key="notes">Notes</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-steps">
+        <p class="kicker">Onboarding</p>
+        <h2>Five short steps. Done once.</h2>
+
+        <ol class="step-track">
+          <li>
+            <span>1</span>
+            <p>Permissions</p>
+          </li>
+          <li>
+            <span>2</span>
+            <p>Model + Value</p>
+          </li>
+          <li>
+            <span>3</span>
+            <p>Quick Settings</p>
+          </li>
+          <li>
+            <span>4</span>
+            <p>Try It</p>
+          </li>
+          <li>
+            <span>5</span>
+            <p>Activate</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section section-proof">
+        <article class="proof-card">
+          <p class="proof-kicker">Private by design</p>
+          <h3>On-device. No cloud transcript.</h3>
+          <ul>
+            <li>WhisperKit + rules-based post-processing</li>
+            <li>No account needed for core use</li>
+            <li>Offline dictation supported</li>
+          </ul>
+        </article>
+
+        <article class="proof-card proof-card-apps">
+          <p class="proof-kicker">Coverage</p>
+          <h3>Works in every app you already use.</h3>
+          <div class="app-cloud">
+            <span>Terminal</span>
+            <span>Firefox</span>
+            <span>Messages</span>
+            <span>Slack</span>
+            <span>Notes</span>
+            <span>Gmail</span>
+            <span>Docs</span>
+            <span>Notion</span>
+            <span>Cursor</span>
+            <span>VS Code</span>
+            <span>Apple Mail</span>
+            <span>Xcode</span>
+          </div>
+        </article>
+
+        <article class="proof-card">
+          <p class="proof-kicker">Intelligence</p>
+          <h3>9-stage cleanup in ~2ms.</h3>
+          <div class="pipeline-grid">
+            <span>Self-correction</span>
+            <span>Filler removal</span>
+            <span>Spoken punctuation</span>
+            <span>Smart formatting</span>
+            <span>Pause punctuation</span>
+            <span>Capitalization</span>
+            <span>Style adaptation</span>
+            <span>List detection</span>
+            <span>Code context</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="section section-value" id="download">
+        <div class="value-layout">
+          <div class="value-copy">
+            <p class="kicker">Value demo</p>
+            <h2>See your monthly upside.</h2>
+            <p class="lead">Two inputs. Instant estimate.</p>
+
+            <div class="close-cta">
+              <p class="close-line">Download now. Own it forever.</p>
+              <a class="button button-primary button-large" href="#download">Download thinkur for Mac - $29</a>
+            </div>
+          </div>
+
+          <div class="savings-shell">
+            <aside class="savings-result">
+              <p class="result-label">Estimated value / month</p>
+              <p class="result-money" id="monthly-savings">$0</p>
+
+              <div class="result-divider" aria-hidden="true"></div>
+
+              <div class="result-metrics">
+                <div>
+                  <p class="metric-value" id="hours-saved">0 hours</p>
+                  <p class="metric-label">time saved</p>
+                </div>
+                <div>
+                  <p class="metric-value" id="words-day">0</p>
+                  <p class="metric-label">words per day</p>
+                </div>
               </div>
-            </div>
-            <div class="console-meta">
-              <span class="state-pill" id="hero-state-label">Idle</span>
-              <span>WhisperKit + 9-stage local post-processing</span>
-            </div>
-          </article>
-        </div>
-      </section>
 
-      <section class="section" id="demo">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Proof</p>
-          <h2>See thinkur adapt to every context.</h2>
-          <p>
-            Same voice, different surface area. thinkur reshapes output for email, chat, and code
-            while preserving your intent.
-          </p>
-        </div>
+              <p class="result-note">$29 one-time. Keep the upside forever.</p>
+            </aside>
 
-        <article class="glass-card demo-shell reveal">
-          <div class="demo-tabs" role="tablist" aria-label="Dictation contexts">
-            <button
-              class="demo-tab is-active"
-              type="button"
-              role="tab"
-              aria-selected="true"
-              data-sample="formal"
-            >
-              Formal Email
-            </button>
-            <button class="demo-tab" type="button" role="tab" aria-selected="false" data-sample="chat">
-              Casual Chat
-            </button>
-            <button class="demo-tab" type="button" role="tab" aria-selected="false" data-sample="code">
-              Code Editor
-            </button>
-          </div>
+            <div class="savings-controls">
+              <article class="control-card">
+                <p class="control-title">Typing time per day</p>
+                <p id="typing-hours-label" class="control-value">2.0h / day</p>
+                <input id="typing-hours" class="slider" type="range" min="0.5" max="8" step="0.5" value="2" />
+              </article>
 
-          <div class="demo-content">
-            <div class="demo-column">
-              <p class="demo-label">Raw dictation</p>
-              <p class="demo-text" id="demo-raw">
-                hey uh can you send the launch note to the team by tuesday and make it sound sharp
-              </p>
-            </div>
-            <div class="demo-column">
-              <p class="demo-label">thinkur output</p>
-              <p class="demo-text demo-output" id="demo-clean">
-                Please send the launch note to the team by Tuesday and ensure the tone is polished.
-              </p>
+              <article class="control-card">
+                <p class="control-title">Your hourly value</p>
+                <label class="money-row" for="hourly-rate">
+                  <span class="money-prefix">$</span>
+                  <input id="hourly-rate" type="number" min="1" step="1" value="50" />
+                  <span class="money-suffix">/hour</span>
+                </label>
+                <p class="field-hint">Use your blended hourly value.</p>
+                <p class="field-error" id="hourly-rate-error" hidden>Enter a valid hourly value.</p>
+              </article>
+
+              <p class="assumption">Assumes up to 4x typing speed and 22 workdays per month.</p>
             </div>
           </div>
-        </article>
-      </section>
-
-      <section class="section" id="pipeline">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Intelligence</p>
-          <h2>Speech is messy. Your text should not be.</h2>
-          <p>
-            Behind the scenes, thinkur runs a 9-stage local AI pipeline to make spoken language read
-            like careful writing.
-          </p>
         </div>
-
-        <div class="pipeline-grid">
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">01</p>
-            <h3>Self-Correction</h3>
-            <p>Detects phrase reversals like "I mean" and removes superseded text.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">02</p>
-            <h3>Filler Removal</h3>
-            <p>Strips verbal tics while keeping meaningful words in context.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">03</p>
-            <h3>Spoken Punctuation</h3>
-            <p>Converts spoken punctuation into symbols without breaking flow.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">04</p>
-            <h3>Smart Formatting</h3>
-            <p>Formats numbers, currency, units, and time into natural written form.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">05</p>
-            <h3>Pause Punctuation</h3>
-            <p>Uses timing gaps to insert punctuation and sentence boundaries.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">06</p>
-            <h3>Capitalization</h3>
-            <p>Applies sentence casing, acronyms, and brand names correctly.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">07</p>
-            <h3>Style Adaptation</h3>
-            <p>Tunes tone to the active app, from formal docs to fast chat.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">08</p>
-            <h3>List Detection</h3>
-            <p>Detects spoken list markers and outputs structured lists.</p>
-          </article>
-          <article class="glass-card stage-card reveal">
-            <p class="stage-step">09</p>
-            <h3>Code Context</h3>
-            <p>Understands code editors, casing commands, and spoken operators.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" id="privacy">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Trust</p>
-          <h2>What happens on your Mac, stays on your Mac.</h2>
-          <p>
-            thinkur processes every syllable on-device using Apple Silicon. Your voice never leaves
-            your machine.
-          </p>
-        </div>
-
-        <div class="privacy-grid">
-          <article class="glass-card privacy-card local reveal">
-            <h3>thinkur</h3>
-            <ul>
-              <li>Fully offline speech processing</li>
-              <li>No cloud routing, no account lock-in</li>
-              <li>Local Neural Engine inference</li>
-              <li>One-time purchase, lifetime use</li>
-            </ul>
-          </article>
-          <article class="glass-card privacy-card cloud reveal">
-            <h3>Typical cloud dictation</h3>
-            <ul>
-              <li>Audio sent to external servers</li>
-              <li>Recurring subscriptions and usage caps</li>
-              <li>Enterprise privacy review overhead</li>
-              <li>Network dependency for core features</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" id="features">
-        <div class="section-heading reveal">
-          <p class="section-kicker">Utility</p>
-          <h2>Built for keyboard-first macOS workflows.</h2>
-          <p>
-            thinkur stays invisible until you need it, then gets out of your way as soon as your text
-            lands.
-          </p>
-        </div>
-
-        <div class="bento-grid">
-          <article class="glass-card bento-card bento-large reveal">
-            <h3>Works in every app</h3>
-            <p>
-              If an app has a text cursor, thinkur can type there. From VS Code to Slack to Apple
-              Mail.
-            </p>
-            <p class="meta">Universal text insertion with app-aware style adaptation.</p>
-          </article>
-          <article class="glass-card bento-card reveal">
-            <h3>Global Control</h3>
-            <p>Map thinkur to any shortcut key and capture thoughts instantly.</p>
-            <p class="meta">Default: Shift+S. Supports custom key maps.</p>
-          </article>
-          <article class="glass-card bento-card reveal">
-            <h3>Offline by default</h3>
-            <p>No internet required to transcribe and process dictation.</p>
-            <p class="meta">Private by architecture, not policy.</p>
-          </article>
-          <article class="glass-card bento-card bento-wide reveal">
-            <h3>Designed for speed</h3>
-            <p>
-              Lightweight interactions, fast state transitions, and responsive input handling keep the
-              dictation loop tight.
-            </p>
-            <p class="meta">Engineered to feel native to macOS, not web software.</p>
-          </article>
-          <article class="glass-card bento-card reveal">
-            <h3>Menu bar native</h3>
-            <p>Lives in your menu bar and never crowds your dock.</p>
-            <p class="meta">Quiet until needed.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section section-pricing" id="pricing">
-        <article class="glass-card pricing-card reveal">
-          <p class="section-kicker">Conversion</p>
-          <h2>One price. Infinite words.</h2>
-          <p>
-            Stop paying rent for productivity tools. Download once, pay once, and own the workflow
-            forever.
-          </p>
-
-          <div class="price-row">
-            <p class="price">$29</p>
-            <p class="price-context">
-              <span class="strike">$180/yr</span> typical subscription alternative
-            </p>
-          </div>
-
-          <a
-            class="button button-primary button-xl js-cta"
-            data-desktop-label="Download for Mac"
-            data-mobile-label="Send link to my Mac"
-            data-desktop-href="#pricing"
-            href="#pricing"
-            >Download for Mac</a
-          >
-          <p class="micro-copy">No account. No recurring fees. macOS only.</p>
-        </article>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <p>Built with care in Northern Ireland. Stop typing, start thinking.</p>
+    <footer class="footer">
+      <p>Built with care in Northern Ireland.</p>
     </footer>
 
-    <div class="modal hidden" id="mobile-modal" aria-hidden="true">
-      <div class="modal-backdrop" data-close-modal></div>
-      <div class="glass-card modal-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-modal-title">
-        <button class="modal-close" type="button" data-close-modal aria-label="Close dialog">Close</button>
-        <h3 id="mobile-modal-title">Send thinkur to your Mac</h3>
-        <p>
-          thinkur is a macOS exclusive. Drop your email below and we will send a direct download link
-          for when you are back at your keyboard.
-        </p>
-
-        <form id="mobile-form" class="modal-form">
-          <label for="email-input">Email</label>
-          <input
-            id="email-input"
-            name="email"
-            type="email"
-            autocomplete="email"
-            required
-            placeholder="name@example.com"
-          />
-          <button class="button button-primary button-xl" id="mobile-submit" type="submit">
-            Send me the download link
-          </button>
-        </form>
-
-        <div class="modal-success hidden" id="mobile-success">
-          <div class="success-check" aria-hidden="true"></div>
-          <p>Link sent. Check your inbox when you are back at your Mac.</p>
-        </div>
-      </div>
-    </div>
-
-    <script src="./app.js" defer></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>

@@ -1,465 +1,139 @@
-const HERO_MESSAGES = {
-  prompt: "Press Shift+S and speak...",
-  messy: "um, yeah so tell the team that we are launching, like, on tuesday...",
-  clean: "Inform the team that we are launching on Tuesday."
-};
+const WORKING_DAYS_PER_MONTH = 22;
+const SPEED_MULTIPLIER = 4;
+const DEFAULT_WPM = 40;
 
-const DEMO_SAMPLES = {
-  formal: {
-    raw: "hey uh can you send the launch note to the team by tuesday and make it sound sharp",
-    clean: "Please send the launch note to the team by Tuesday and ensure the tone is polished."
+const DEMO_CONTENT = {
+  terminal: {
+    context: "Terminal",
+    raw: "um can you check the deploy status then restart the worker",
+    clean: "Can you check the deploy status, then restart the worker?"
   },
-  chat: {
-    raw: "um i will be there in like five minutes just grabbing coffee",
-    clean: "i will be there in five minutes, just grabbing coffee."
+  firefox: {
+    context: "Firefox",
+    raw: "dear sarah comma thanks for the update period we can ship tuesday",
+    clean: "Dear Sarah, thanks for the update. We can ship Tuesday."
   },
-  code: {
-    raw: "camel case get user name and if count less than ten open brace",
-    clean: "getUserName and if count < 10 {"
+  messages: {
+    context: "Messages",
+    raw: "yeah i'll be there in ten minutes just grabbing coffee",
+    clean: "i'll be there in ten minutes, just grabbing coffee."
+  },
+  slack: {
+    context: "Slack",
+    raw: "first check logs second restart api third post status",
+    clean: "1. Check logs\n2. Restart API\n3. Post status"
+  },
+  notes: {
+    context: "Notes",
+    raw: "meeting moved to two thirty pm on march third",
+    clean: "Meeting moved to 2:30 PM on March 3rd."
   }
 };
 
-const GRID_COLUMNS = 3;
-const GRID_ROWS = 6;
-const MOBILE_UA_REGEX = /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i;
-const listeningIntervals = new WeakMap();
-const modalElements = {
-  modal: null,
-  form: null,
-  success: null,
-  email: null,
-  submit: null,
-  submitLabel: ""
-};
-
-let mobileCtaMode = false;
-
-function wait(ms) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 }
 
-function buildPixelGrid(grid) {
-  if (!grid || grid.children.length > 0) {
+function formatCurrency(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function computeSavings(hoursTypingPerDay, hourlyRate) {
+  const dailyHoursSaved = hoursTypingPerDay * (1 - 1 / SPEED_MULTIPLIER);
+  const monthlyHoursSaved = dailyHoursSaved * WORKING_DAYS_PER_MONTH;
+  const monthlySavings = monthlyHoursSaved * hourlyRate;
+  const wordsPerDay = Math.round(hoursTypingPerDay * 60 * DEFAULT_WPM);
+
+  return {
+    monthlySavings,
+    monthlyHoursSaved,
+    wordsPerDay
+  };
+}
+
+function initSavingsCalculator() {
+  const hoursSlider = document.getElementById("typing-hours");
+  const hoursLabel = document.getElementById("typing-hours-label");
+  const hourlyRateInput = document.getElementById("hourly-rate");
+  const hourlyRateError = document.getElementById("hourly-rate-error");
+
+  const monthlySavingsEl = document.getElementById("monthly-savings");
+  const hoursSavedEl = document.getElementById("hours-saved");
+  const wordsDayEl = document.getElementById("words-day");
+
+  if (
+    !hoursSlider ||
+    !hoursLabel ||
+    !hourlyRateInput ||
+    !hourlyRateError ||
+    !monthlySavingsEl ||
+    !hoursSavedEl ||
+    !wordsDayEl
+  ) {
     return;
   }
 
-  let idx = 0;
-  for (let row = 0; row < GRID_ROWS; row += 1) {
-    for (let col = 0; col < GRID_COLUMNS; col += 1) {
-      const pixel = document.createElement("span");
-      pixel.className = "pixel";
-      pixel.style.setProperty("--idx", String(idx));
-      pixel.style.setProperty("--col", String(col));
-      pixel.style.setProperty("--row", String(row));
-      pixel.dataset.col = String(col);
-      pixel.dataset.row = String(row);
-      pixel.dataset.active = "0";
-      grid.appendChild(pixel);
-      idx += 1;
-    }
-  }
-}
+  const update = () => {
+    const hoursTypingPerDay = clampNumber(Number(hoursSlider.value) || 2, 0.5, 8);
+    const parsedRate = Number(hourlyRateInput.value);
+    const hasRateError = !Number.isFinite(parsedRate) || parsedRate <= 0;
+    const hourlyRate = clampNumber(hasRateError ? 50 : parsedRate, 1, 100000);
 
-function setGridLevels(grid, levels) {
-  const pixels = grid.querySelectorAll(".pixel");
-  pixels.forEach((pixel) => {
-    const col = Number(pixel.dataset.col);
-    const row = Number(pixel.dataset.row);
-    const level = levels[col] || 0;
-    const isActive = GRID_ROWS - row <= level;
-    pixel.dataset.active = isActive ? "1" : "0";
-  });
-}
+    const { monthlySavings, monthlyHoursSaved, wordsPerDay } = computeSavings(hoursTypingPerDay, hourlyRate);
 
-function stopEqualizer(grid) {
-  const existing = listeningIntervals.get(grid);
-  if (existing) {
-    window.clearInterval(existing);
-    listeningIntervals.delete(grid);
-  }
-  setGridLevels(grid, [0, 0, 0]);
-}
+    hoursLabel.textContent = `${hoursTypingPerDay.toFixed(1)}h / day`;
+    monthlySavingsEl.textContent = formatCurrency(monthlySavings);
+    hoursSavedEl.textContent = `${Math.round(monthlyHoursSaved)} hours`;
+    wordsDayEl.textContent = new Intl.NumberFormat("en-US").format(wordsPerDay);
 
-function startEqualizer(grid) {
-  stopEqualizer(grid);
-
-  const animate = () => {
-    const levels = Array.from({ length: GRID_COLUMNS }, () => 2 + Math.floor(Math.random() * 5));
-    setGridLevels(grid, levels);
+    hourlyRateError.hidden = !hasRateError;
   };
 
-  animate();
-  const intervalId = window.setInterval(animate, 120);
-  listeningIntervals.set(grid, intervalId);
+  hoursSlider.addEventListener("input", update);
+  hourlyRateInput.addEventListener("input", update);
+  update();
 }
 
-function setGridState(grid, nextState) {
-  if (!grid) {
+function initDemoContextSwitcher() {
+  const buttons = document.querySelectorAll("[data-demo-key]");
+  const contextEl = document.getElementById("demo-context");
+  const rawEl = document.getElementById("demo-raw");
+  const cleanEl = document.getElementById("demo-clean");
+
+  if (!buttons.length || !contextEl || !rawEl || !cleanEl) {
     return;
   }
 
-  if (nextState === "listening") {
-    startEqualizer(grid);
-  } else {
-    stopEqualizer(grid);
-  }
-
-  grid.dataset.state = nextState;
-}
-
-function updateHeroStateLabel(labelElement, text, phase) {
-  if (!labelElement) {
-    return;
-  }
-
-  labelElement.textContent = text;
-  if (phase === "processing") {
-    labelElement.style.borderColor = "rgba(255, 214, 107, 0.55)";
-    labelElement.style.color = "#ffeeb8";
-    return;
-  }
-
-  labelElement.style.borderColor = "rgba(52, 199, 89, 0.45)";
-  labelElement.style.color = "#6bff9d";
-}
-
-async function typeText(target, text, charDelay) {
-  target.textContent = "";
-  for (const char of text) {
-    target.textContent += char;
-    // Keep typing cadence human without locking the thread.
-    await wait(charDelay);
-  }
-}
-
-async function startHeroLoop() {
-  const grid = document.getElementById("hero-grid");
-  const textElement = document.getElementById("hero-text");
-  const stateLabel = document.getElementById("hero-state-label");
-
-  if (!grid || !textElement || !stateLabel) {
-    return;
-  }
-
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reducedMotion) {
-    setGridState(grid, "idle");
-    updateHeroStateLabel(stateLabel, "Ready", "idle");
-    textElement.textContent = HERO_MESSAGES.clean;
-    return;
-  }
-
-  while (document.body.contains(grid)) {
-    if (document.hidden) {
-      await wait(320);
-      continue;
-    }
-
-    setGridState(grid, "idle");
-    updateHeroStateLabel(stateLabel, "Idle", "idle");
-    textElement.textContent = HERO_MESSAGES.prompt;
-    await wait(820);
-
-    setGridState(grid, "listening");
-    updateHeroStateLabel(stateLabel, "Listening", "listening");
-    await typeText(textElement, HERO_MESSAGES.messy, 18);
-    await wait(280);
-
-    setGridState(grid, "processing");
-    updateHeroStateLabel(stateLabel, "Processing", "processing");
-    await wait(820);
-
-    setGridState(grid, "success");
-    updateHeroStateLabel(stateLabel, "Polished", "success");
-    textElement.textContent = HERO_MESSAGES.clean;
-    await wait(1450);
-  }
-}
-
-function initThemeToggle() {
-  const button = document.getElementById("theme-toggle");
-  if (!button) {
-    return;
-  }
-
-  const root = document.documentElement;
-  const stored = window.localStorage.getItem("thinkur-theme");
-  if (stored === "dark" || stored === "light") {
-    root.setAttribute("data-theme", stored);
-  }
-
-  const setButtonLabel = () => {
-    const activeTheme = root.getAttribute("data-theme") || "dark";
-    button.textContent = activeTheme === "dark" ? "Light" : "Dark";
-  };
-
-  setButtonLabel();
-  button.addEventListener("click", () => {
-    const activeTheme = root.getAttribute("data-theme") || "dark";
-    const nextTheme = activeTheme === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", nextTheme);
-    window.localStorage.setItem("thinkur-theme", nextTheme);
-    setButtonLabel();
-  });
-}
-
-function swapText(element, text) {
-  if (!element) {
-    return;
-  }
-
-  element.classList.add("is-updating");
-  window.setTimeout(() => {
-    element.textContent = text;
-    element.classList.remove("is-updating");
-  }, 120);
-}
-
-function setActiveDemoTab(tabs, sampleKey) {
-  tabs.forEach((tab) => {
-    const active = tab.dataset.sample === sampleKey;
-    tab.classList.toggle("is-active", active);
-    tab.setAttribute("aria-selected", active ? "true" : "false");
-  });
-}
-
-function initDemoTabs() {
-  const tabs = Array.from(document.querySelectorAll(".demo-tab"));
-  const raw = document.getElementById("demo-raw");
-  const clean = document.getElementById("demo-clean");
-  const container = document.querySelector(".demo-shell");
-
-  if (!tabs.length || !raw || !clean) {
-    return;
-  }
-
-  let activeKey = "formal";
-  let autoCycle = null;
-  const order = Object.keys(DEMO_SAMPLES);
-
-  const render = (key) => {
-    const sample = DEMO_SAMPLES[key];
-    if (!sample) {
+  const setContext = (key) => {
+    const next = DEMO_CONTENT[key];
+    if (!next) {
       return;
     }
-    swapText(raw, sample.raw);
-    swapText(clean, sample.clean);
+
+    buttons.forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.demoKey === key);
+    });
+
+    contextEl.textContent = next.context;
+    rawEl.textContent = next.raw;
+    cleanEl.textContent = next.clean;
   };
 
-  const startAutoCycle = () => {
-    if (autoCycle) {
-      window.clearInterval(autoCycle);
-    }
-    autoCycle = window.setInterval(() => {
-      const currentIndex = order.indexOf(activeKey);
-      const nextIndex = (currentIndex + 1) % order.length;
-      activeKey = order[nextIndex];
-      setActiveDemoTab(tabs, activeKey);
-      render(activeKey);
-    }, 6200);
-  };
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const nextKey = tab.dataset.sample;
-      if (!nextKey || nextKey === activeKey) {
-        return;
-      }
-      activeKey = nextKey;
-      setActiveDemoTab(tabs, activeKey);
-      render(activeKey);
-      startAutoCycle();
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setContext(button.dataset.demoKey || "terminal");
     });
   });
 
-  if (container) {
-    container.addEventListener("mouseenter", () => {
-      if (autoCycle) {
-        window.clearInterval(autoCycle);
-      }
-    });
-    container.addEventListener("mouseleave", startAutoCycle);
-  }
-
-  setActiveDemoTab(tabs, activeKey);
-  render(activeKey);
-  startAutoCycle();
-}
-
-function initRevealObserver() {
-  const revealElements = Array.from(document.querySelectorAll(".reveal"));
-  if (!revealElements.length) {
-    return;
-  }
-
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const lowComplexityViewport = window.matchMedia("(max-width: 760px)").matches;
-  if (!("IntersectionObserver" in window) || reducedMotion || lowComplexityViewport) {
-    revealElements.forEach((element) => {
-      element.classList.add("is-visible");
-    });
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      });
-    },
-    {
-      root: null,
-      rootMargin: "0px 0px -12% 0px",
-      threshold: 0.16
-    }
-  );
-
-  revealElements.forEach((element) => observer.observe(element));
-}
-
-function detectMobileMode() {
-  return MOBILE_UA_REGEX.test(navigator.userAgent || "");
-}
-
-function openMobileModal() {
-  if (!modalElements.modal) {
-    return;
-  }
-  modalElements.modal.classList.remove("hidden");
-  modalElements.modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-  if (modalElements.email) {
-    window.setTimeout(() => modalElements.email.focus(), 60);
-  }
-}
-
-function resetMobileModal() {
-  if (modalElements.form) {
-    modalElements.form.reset();
-    modalElements.form.classList.remove("hidden");
-  }
-
-  if (modalElements.success) {
-    modalElements.success.classList.add("hidden");
-  }
-
-  if (modalElements.submit) {
-    modalElements.submit.disabled = false;
-    modalElements.submit.textContent = modalElements.submitLabel;
-  }
-}
-
-function closeMobileModal() {
-  if (!modalElements.modal) {
-    return;
-  }
-
-  modalElements.modal.classList.add("hidden");
-  modalElements.modal.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-  resetMobileModal();
-}
-
-async function handleMobileFormSubmit(event) {
-  event.preventDefault();
-
-  if (!modalElements.email || !modalElements.submit || !modalElements.form || !modalElements.success) {
-    return;
-  }
-
-  if (!modalElements.email.checkValidity()) {
-    modalElements.email.reportValidity();
-    return;
-  }
-
-  modalElements.submit.disabled = true;
-  modalElements.submit.textContent = "Sending...";
-  await wait(700);
-  modalElements.form.classList.add("hidden");
-  modalElements.success.classList.remove("hidden");
-  await wait(1800);
-  closeMobileModal();
-}
-
-function initMobileModal() {
-  modalElements.modal = document.getElementById("mobile-modal");
-  modalElements.form = document.getElementById("mobile-form");
-  modalElements.success = document.getElementById("mobile-success");
-  modalElements.email = document.getElementById("email-input");
-  modalElements.submit = document.getElementById("mobile-submit");
-  modalElements.submitLabel = modalElements.submit ? modalElements.submit.textContent : "";
-
-  if (!modalElements.modal) {
-    return;
-  }
-
-  const closeTriggers = Array.from(document.querySelectorAll("[data-close-modal]"));
-  closeTriggers.forEach((trigger) => {
-    trigger.addEventListener("click", closeMobileModal);
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !modalElements.modal.classList.contains("hidden")) {
-      closeMobileModal();
-    }
-  });
-
-  if (modalElements.form) {
-    modalElements.form.addEventListener("submit", handleMobileFormSubmit);
-  }
-}
-
-function initCtas() {
-  const ctas = Array.from(document.querySelectorAll(".js-cta"));
-  if (!ctas.length) {
-    return;
-  }
-
-  mobileCtaMode = detectMobileMode();
-
-  ctas.forEach((cta) => {
-    const desktopLabel = cta.dataset.desktopLabel || cta.textContent.trim();
-    const mobileLabel = cta.dataset.mobileLabel || "Send link to my Mac";
-    const desktopHref = cta.dataset.desktopHref || "#pricing";
-
-    if (mobileCtaMode) {
-      cta.textContent = mobileLabel;
-      cta.setAttribute("href", "#");
-    } else {
-      cta.textContent = desktopLabel;
-      cta.setAttribute("href", desktopHref);
-    }
-
-    cta.addEventListener("click", (event) => {
-      if (!mobileCtaMode) {
-        return;
-      }
-      event.preventDefault();
-      openMobileModal();
-    });
-  });
-}
-
-function initPixelGrids() {
-  const grids = Array.from(document.querySelectorAll(".pixel-grid"));
-  grids.forEach((grid) => {
-    buildPixelGrid(grid);
-    setGridState(grid, "idle");
-  });
+  const defaultKey = Array.from(buttons).find((button) => button.classList.contains("is-active"))?.dataset.demoKey;
+  setContext(defaultKey || "terminal");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  initPixelGrids();
-  initThemeToggle();
-  initRevealObserver();
-  initDemoTabs();
-  initMobileModal();
-  initCtas();
-  startHeroLoop();
+  initDemoContextSwitcher();
+  initSavingsCalculator();
 });
