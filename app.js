@@ -585,15 +585,24 @@ class DemoPlayback {
     this.previewEl = previewEl;
     this.activeKey = "terminal";
     this.token = 0;
-    this.timeouts = [];
+    this.controlTimers = [];
+    this.pendingWaits = new Set();
     this.spinners = [];
     this.refs = null;
     this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
-  clearTimers() {
-    this.timeouts.forEach((timer) => window.clearTimeout(timer));
-    this.timeouts = [];
+  clearControlTimers() {
+    this.controlTimers.forEach((timer) => window.clearTimeout(timer));
+    this.controlTimers = [];
+  }
+
+  clearPendingWaits() {
+    this.pendingWaits.forEach((waiter) => {
+      window.clearTimeout(waiter.timer);
+      waiter.resolve(false);
+    });
+    this.pendingWaits.clear();
   }
 
   clearSpinners() {
@@ -603,7 +612,8 @@ class DemoPlayback {
 
   stop() {
     this.token += 1;
-    this.clearTimers();
+    this.clearControlTimers();
+    this.clearPendingWaits();
     this.clearSpinners();
   }
 
@@ -639,7 +649,7 @@ class DemoPlayback {
       this.run(this.token + 1);
     }, 100);
 
-    this.timeouts.push(swapTimer);
+    this.controlTimers.push(swapTimer);
   }
 
   setSpinnerState(state) {
@@ -690,10 +700,24 @@ class DemoPlayback {
 
   waitFor(ms, token) {
     return new Promise((resolve) => {
-      const timer = window.setTimeout(() => {
-        resolve(token === this.token);
+      const waiter = {
+        timer: 0,
+        resolve: () => {}
+      };
+
+      waiter.resolve = (value) => {
+        if (!this.pendingWaits.has(waiter)) {
+          return;
+        }
+        this.pendingWaits.delete(waiter);
+        resolve(value);
+      };
+
+      waiter.timer = window.setTimeout(() => {
+        waiter.resolve(token === this.token);
       }, ms);
-      this.timeouts.push(timer);
+
+      this.pendingWaits.add(waiter);
     });
   }
 
@@ -751,37 +775,37 @@ class DemoPlayback {
       }
 
       this.setPhase(DEMO_PHASE.IDLE, scenario);
-      if (!(await this.waitFor(850, token))) {
+      if (!(await this.waitFor(680, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.LISTENING, scenario);
-      const rawComplete = await this.typeInto(this.refs.raw, scenario.raw, token, 28);
+      const rawComplete = await this.typeInto(this.refs.raw, scenario.raw, token, 24);
       if (!rawComplete) {
         return;
       }
 
-      if (!(await this.waitFor(200, token))) {
+      if (!(await this.waitFor(140, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.PROCESSING, scenario);
-      if (!(await this.waitFor(820, token))) {
+      if (!(await this.waitFor(720, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.SUCCESS, scenario);
-      const cleanComplete = await this.typeInto(this.refs.clean, scenario.clean, token, 20);
+      const cleanComplete = await this.typeInto(this.refs.clean, scenario.clean, token, 12);
       if (!cleanComplete) {
         return;
       }
 
-      if (!(await this.waitFor(1200, token))) {
+      if (!(await this.waitFor(900, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.IDLE, scenario);
-      if (!(await this.waitFor(1800, token))) {
+      if (!(await this.waitFor(1300, token))) {
         return;
       }
     }
@@ -814,9 +838,10 @@ function initDemoContextSwitcher() {
     });
   });
 
-  const defaultKey =
-    buttons.find((button) => button.classList.contains("is-active"))?.dataset.demoKey || "terminal";
-  setActive(defaultKey);
+  const requestedKey = new URLSearchParams(window.location.search).get("demo");
+  const defaultKey = buttons.find((button) => button.classList.contains("is-active"))?.dataset.demoKey || "terminal";
+  const initialKey = requestedKey && DEMO_SCENARIOS[requestedKey] ? requestedKey : defaultKey;
+  setActive(initialKey);
 
   window.addEventListener("beforeunload", () => {
     playback.stop();

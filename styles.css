@@ -349,11 +349,22 @@ h3,
 }
 
 .window-dot {
-  background: #3e3e46;
   border-radius: 999px;
   display: block;
   height: 8px;
   width: 8px;
+}
+
+.window-dot:nth-child(1) {
+  background: #ff5f57;
+}
+
+.window-dot:nth-child(2) {
+  background: #febc2e;
+}
+
+.window-dot:nth-child(3) {
+  background: #28c840;
 }
 
 .window-app {
@@ -466,12 +477,12 @@ h3,
 }
 
 .preview-terminal {
-  background: #111216;
+  background: #17171a;
   border: 1px solid var(--line-soft);
   border-radius: 12px;
   color: #dddee5;
   display: grid;
-  gap: 9px;
+  gap: 10px;
   padding: 12px;
 }
 
@@ -484,12 +495,25 @@ h3,
   margin: 0;
 }
 
+.terminal-pane {
+  background: #101114;
+  border: 1px solid #25262d;
+  border-radius: 10px;
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+}
+
 .terminal-line {
   color: #8d8f99;
 }
 
 .terminal-line.is-dim {
-  opacity: 0.7;
+  opacity: 0.52;
+}
+
+[data-role="raw-line"].is-dim {
+  opacity: 0.56;
 }
 
 .terminal-clean {
@@ -500,8 +524,16 @@ h3,
   text-shadow: 0 0 10px rgba(52, 199, 89, 0.35);
 }
 
+[data-role="clean-line"].is-emphasis {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
 .terminal-out {
   color: #b9bbc3;
+}
+
+.terminal-ok {
+  color: #9ec9a9;
 }
 
 .prompt {
@@ -513,7 +545,7 @@ h3,
   gap: 10px;
 }
 
-.browser-top {
+.browser-toolbar {
   align-items: center;
   background: #121318;
   border: 1px solid var(--line-soft);
@@ -522,6 +554,32 @@ h3,
   gap: 8px;
   min-height: 38px;
   padding: 0 10px;
+}
+
+.browser-nav {
+  align-items: center;
+  display: inline-flex;
+  gap: 5px;
+}
+
+.browser-nav-btn {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: #9799a3;
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 700;
+  height: 18px;
+  justify-content: center;
+  width: 18px;
+}
+
+.browser-url-wrap {
+  align-items: center;
+  display: inline-flex;
+  flex: 1;
+  gap: 8px;
 }
 
 .browser-lock {
@@ -550,6 +608,7 @@ h3,
   border: 1px solid var(--line);
   border-radius: 8px;
   color: #9c9ea8;
+  flex: 1;
   font-size: 0.73rem;
   line-height: 1;
   margin: 0;
@@ -564,16 +623,31 @@ h3,
   border: 1px solid var(--line-soft);
   border-radius: 12px;
   display: grid;
-  gap: 8px;
+  gap: 7px;
   padding: 12px;
 }
 
 .mail-row {
+  align-items: center;
   border-bottom: 1px solid var(--line-soft);
   color: #b6b7bf;
+  display: flex;
   font-size: 0.79rem;
+  justify-content: space-between;
   margin: 0;
   padding-bottom: 8px;
+}
+
+.mail-row span:first-child {
+  color: #8f919b;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mail-row span:last-child {
+  color: #dfe0e6;
 }
 
 .mail-draft,
@@ -607,13 +681,33 @@ h3,
   border: 1px solid var(--line-soft);
   border-radius: 12px;
   display: flex;
-  justify-content: center;
-  min-height: 34px;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 10px;
+}
+
+.messages-avatar {
+  background: radial-gradient(circle at 32% 30%, #5cc0ff, #3478f6);
+  border-radius: 999px;
+  display: block;
+  height: 20px;
+  width: 20px;
+}
+
+.messages-meta {
+  display: grid;
+  gap: 1px;
+}
+
+.messages-time {
+  color: #8f929d;
+  font-size: 0.65rem;
+  margin: 0;
 }
 
 .messages-name {
   color: #d5d6de;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   margin: 0;
 }
@@ -644,16 +738,22 @@ h3,
 }
 
 .bubble-reply {
-  background: #17181d;
-  color: #9da0aa;
+  background: #101113;
+  border: 1px solid #22242a;
+  color: #90939d;
+  justify-self: end;
   min-height: 34px;
 }
 
 .bubble-clean {
-  background: #34c759;
-  color: #06240f;
+  background: #0a84ff;
+  color: #f4f8ff;
   justify-self: end;
   min-height: 34px;
+}
+
+.bubble-clean.is-emphasis {
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.44), 0 0 18px rgba(10, 132, 255, 0.28);
 }
 
 .chat-input {
@@ -663,6 +763,7 @@ h3,
   color: #d9dae0;
   font-size: 0.82rem;
   margin: 0;
+  min-height: 38px;
   padding: 10px;
 }
 
@@ -697,6 +798,16 @@ h3,
   padding: 12px 10px;
 }
 
+.slack-workspace {
+  border-bottom: 1px solid var(--line-soft);
+  color: #e6e7eb;
+  font-size: 0.71rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
+  padding-bottom: 7px;
+}
+
 .slack-main {
   background: #121318;
   border: 1px solid var(--line-soft);
@@ -707,9 +818,46 @@ h3,
   padding: 12px;
 }
 
+.slack-channel {
+  border-bottom: 1px solid var(--line-soft);
+  color: #e9eaf0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin: 0;
+  padding-bottom: 7px;
+}
+
 .slack-message {
+  align-items: center;
+  color: #c8cad2;
+  display: inline-flex;
+  gap: 7px;
+  font-size: 0.72rem;
+  margin: 0;
+}
+
+.slack-avatar {
+  align-items: center;
+  background: #36c5f0;
+  border-radius: 999px;
+  color: #041e29;
+  display: inline-flex;
+  font-size: 0.62rem;
+  font-weight: 800;
+  height: 16px;
+  justify-content: center;
+  width: 16px;
+}
+
+.slack-meta {
   color: #e2e2e8;
-  font-size: 0.81rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.slack-copy {
+  color: #d7d8de;
+  font-size: 0.8rem;
   margin: 0;
 }
 
@@ -733,6 +881,10 @@ h3,
   white-space: pre-line;
 }
 
+.slack-clean.is-emphasis {
+  border-color: #3a3f4b;
+}
+
 .preview-notes {
   display: grid;
   grid-template-columns: 118px 1fr;
@@ -751,6 +903,17 @@ h3,
   padding: 12px 10px;
 }
 
+.notes-list-label {
+  border-bottom: 1px solid var(--line-soft);
+  color: #b7bac4;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+  padding-bottom: 6px;
+  text-transform: uppercase;
+}
+
 .notes-editor {
   background: #121318;
   border: 1px solid var(--line-soft);
@@ -761,11 +924,27 @@ h3,
   padding: 12px;
 }
 
+.notes-toolbar {
+  border-bottom: 1px solid var(--line-soft);
+  color: #d1d2d8;
+  display: flex;
+  font-size: 0.69rem;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  padding-bottom: 7px;
+}
+
 .notes-title {
   color: #f4f4f6;
   font-size: 0.95rem;
   font-weight: 600;
   margin: 0;
+}
+
+.notes-meta {
+  color: #878a95;
+  font-size: 0.68rem;
+  margin: -2px 0 0;
 }
 
 .notes-draft,
@@ -784,6 +963,10 @@ h3,
   color: #eef0f4;
   min-height: 38px;
   padding-top: 9px;
+}
+
+.notes-clean.is-emphasis {
+  color: #ffffff;
 }
 
 .section-apps {
