@@ -696,7 +696,8 @@ class DemoPlayback {
       if (this.refs.liveText) {
         this.refs.liveText.textContent = "";
       }
-      if (!(await this.waitFor(960, token))) {
+      const listeningMs = Math.round(1350 + Math.random() * 700);
+      if (!(await this.waitFor(listeningMs, token))) {
         return;
       }
 
@@ -801,15 +802,34 @@ function initThemeToggle() {
 function initAppMarquee() {
   const marquee = document.querySelector(".app-marquee");
   const track = marquee?.querySelector(".app-track");
+  const lane = track?.querySelector(".app-lane");
 
-  if (!marquee || !track) {
+  if (!marquee || !track || !lane) {
     return;
   }
 
-  const clone = track.cloneNode(true);
+  const hasClone = track.querySelector(".app-lane.is-clone");
+  if (hasClone) {
+    return;
+  }
+
+  const clone = lane.cloneNode(true);
   clone.classList.add("is-clone");
   clone.setAttribute("aria-hidden", "true");
-  marquee.append(clone);
+  track.append(clone);
+
+  const syncWidth = () => {
+    const firstLane = track.querySelector(".app-lane");
+    if (!firstLane) {
+      return;
+    }
+    const laneWidth = Math.ceil(firstLane.getBoundingClientRect().width + 12);
+    track.style.setProperty("--lane-width", `${laneWidth}px`);
+  };
+
+  syncWidth();
+  window.requestAnimationFrame(syncWidth);
+  window.addEventListener("resize", syncWidth, { passive: true });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
