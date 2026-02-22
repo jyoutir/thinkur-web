@@ -9,13 +9,6 @@ const DEMO_PHASE = {
   SUCCESS: "success"
 };
 
-const PHASE_TEXT = {
-  idle: "Ready",
-  listening: "Listening...",
-  processing: "Processing...",
-  success: "Inserted"
-};
-
 const DEMO_SCENARIOS = {
   terminal: {
     title: "Terminal",
@@ -25,18 +18,8 @@ const DEMO_SCENARIOS = {
     clean: "Can you check the deploy status, then restart the worker?",
     renderBody: () => `
       <div class="preview-terminal">
-        <p class="terminal-out"><span class="prompt">ops@macbook % </span>kubectl get deploy/worker -n prod</p>
-        <p class="terminal-out"><span class="terminal-ok">worker</span> 3/3 Running 0 7d</p>
-        <div class="terminal-pane">
-          <p class="pane-label">dictated</p>
-          <p class="terminal-line" data-role="raw-line"><span class="prompt">ops@macbook % </span><span data-role="raw"></span><span class="type-caret" data-role="raw-caret"></span></p>
-          <p class="pane-label">inserted</p>
-          <p class="terminal-clean" data-role="clean-line"><span class="prompt">ops@macbook % </span><span data-role="clean"></span></p>
-        </div>
-        <p class="preview-live is-hidden" data-role="live-inline">
-          <span class="pixel-spinner is-mini" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
-          <span data-role="phase-inline"></span>
-        </p>
+        <p class="terminal-command"><span class="prompt">ops@macbook % </span>claude --dangerously-skip-permissions</p>
+        <p class="terminal-live" data-role="live-line"><span class="prompt">ops@macbook % </span><span data-role="live-text"></span><span class="type-caret" data-role="caret"></span></p>
       </div>
     `
   },
@@ -62,14 +45,7 @@ const DEMO_SCENARIOS = {
         <div class="browser-card">
           <p class="mail-row"><span>To</span><span>sarah@company.com</span></p>
           <p class="mail-row"><span>Subject</span><span>Project update</span></p>
-          <p class="pane-label">dictated draft</p>
-          <p class="mail-draft" data-role="raw-line"><span data-role="raw"></span><span class="type-caret" data-role="raw-caret"></span></p>
-          <p class="pane-label">inserted at cursor</p>
-          <p class="mail-clean" data-role="clean-line"><span data-role="clean"></span></p>
-          <p class="preview-live is-hidden" data-role="live-inline">
-            <span class="pixel-spinner is-mini" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
-            <span data-role="phase-inline"></span>
-          </p>
+          <p class="mail-live" data-role="live-line"><span data-role="live-text"></span><span class="type-caret" data-role="caret"></span></p>
         </div>
       </div>
     `
@@ -90,13 +66,8 @@ const DEMO_SCENARIOS = {
           </div>
         </div>
         <div class="chat-thread">
-          <p class="bubble">Can we move the sync to later this week?</p>
-          <p class="bubble-reply" data-role="raw-line"><span data-role="raw"></span><span class="type-caret" data-role="raw-caret"></span></p>
-          <p class="bubble-clean" data-role="clean-line"><span data-role="clean"></span></p>
-          <p class="preview-live is-hidden" data-role="live-inline">
-            <span class="pixel-spinner is-mini" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
-            <span data-role="phase-inline"></span>
-          </p>
+          <p class="bubble bubble-in">Can we move the sync to later this week?</p>
+          <p class="bubble bubble-out" data-role="live-line"><span data-role="live-text"></span><span class="type-caret" data-role="caret"></span></p>
         </div>
         <p class="chat-input">iMessage</p>
       </div>
@@ -121,14 +92,7 @@ const DEMO_SCENARIOS = {
           <p class="slack-channel"># backend</p>
           <p class="slack-message"><span class="slack-avatar" aria-hidden="true">A</span><span class="slack-meta">Alice · 10:38 AM</span></p>
           <p class="slack-copy">Can someone check the deployment status?</p>
-          <p class="pane-label">dictated draft</p>
-          <p class="slack-draft" data-role="raw-line"><span data-role="raw"></span><span class="type-caret" data-role="raw-caret"></span></p>
-          <p class="pane-label">inserted message</p>
-          <p class="slack-clean" data-role="clean-line"><span data-role="clean"></span></p>
-          <p class="preview-live is-hidden" data-role="live-inline">
-            <span class="pixel-spinner is-mini" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
-            <span data-role="phase-inline"></span>
-          </p>
+          <p class="slack-live" data-role="live-line"><span data-role="live-text"></span><span class="type-caret" data-role="caret"></span></p>
         </div>
       </div>
     `
@@ -154,14 +118,7 @@ const DEMO_SCENARIOS = {
           </div>
           <p class="notes-title">Meeting Notes</p>
           <p class="notes-meta">February 22, 2026</p>
-          <p class="pane-label">dictated draft</p>
-          <p class="notes-draft" data-role="raw-line"><span data-role="raw"></span><span class="type-caret" data-role="raw-caret"></span></p>
-          <p class="pane-label">inserted text</p>
-          <p class="notes-clean" data-role="clean-line"><span data-role="clean"></span></p>
-          <p class="preview-live is-hidden" data-role="live-inline">
-            <span class="pixel-spinner is-mini" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
-            <span data-role="phase-inline"></span>
-          </p>
+          <p class="notes-live" data-role="live-line"><span data-role="live-text"></span><span class="type-caret" data-role="caret"></span></p>
         </div>
       </div>
     `
@@ -177,13 +134,13 @@ function renderWindowShell(scenario) {
             <span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span>
           </div>
           <div class="window-app">
-            <img src="${scenario.icon}" alt="" width="14" height="14" />
+            <img src="${scenario.icon}" alt="" width="16" height="16" />
             <p class="window-title">${scenario.title}</p>
           </div>
         </div>
         <div class="window-status">
           <span class="pixel-spinner" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
-          <span data-role="phase-label">${PHASE_TEXT.idle}</span>
+          <span class="window-phase" data-role="phase-label">Ready</span>
         </div>
       </div>
       <div class="preview-body">${scenario.renderBody()}</div>
@@ -630,14 +587,10 @@ class DemoPlayback {
 
       this.refs = {
         frame: this.previewEl.querySelector(".window-frame"),
+        liveText: this.previewEl.querySelector("[data-role='live-text']"),
+        liveLine: this.previewEl.querySelector("[data-role='live-line']"),
         phaseLabel: this.previewEl.querySelector("[data-role='phase-label']"),
-        phaseInline: this.previewEl.querySelector("[data-role='phase-inline']"),
-        raw: this.previewEl.querySelector("[data-role='raw']"),
-        rawLine: this.previewEl.querySelector("[data-role='raw-line']"),
-        rawCaret: this.previewEl.querySelector("[data-role='raw-caret']"),
-        clean: this.previewEl.querySelector("[data-role='clean']"),
-        cleanLine: this.previewEl.querySelector("[data-role='clean-line']"),
-        liveInline: this.previewEl.querySelector("[data-role='live-inline']")
+        caret: this.previewEl.querySelector("[data-role='caret']")
       };
 
       this.spinners = Array.from(this.previewEl.querySelectorAll("[data-spinner]")).map((element) => {
@@ -665,34 +618,26 @@ class DemoPlayback {
 
     this.refs.frame?.setAttribute("data-phase", phase);
 
-    const topText = phase === DEMO_PHASE.SUCCESS ? `Inserted in ${scenario.latency}` : PHASE_TEXT[phase];
-    const inlineText = phase === DEMO_PHASE.SUCCESS ? "Inserted" : PHASE_TEXT[phase];
-
     if (this.refs.phaseLabel) {
-      this.refs.phaseLabel.textContent = topText;
+      if (phase === DEMO_PHASE.LISTENING) {
+        this.refs.phaseLabel.textContent = "Listening...";
+      } else if (phase === DEMO_PHASE.PROCESSING) {
+        this.refs.phaseLabel.textContent = "Processing 0.1s";
+      } else if (phase === DEMO_PHASE.SUCCESS) {
+        this.refs.phaseLabel.textContent = `Inserted in ${scenario.latency}`;
+      } else {
+        this.refs.phaseLabel.textContent = "Ready";
+      }
     }
 
-    if (this.refs.phaseInline) {
-      this.refs.phaseInline.textContent = inlineText;
+    if (this.refs.liveLine) {
+      this.refs.liveLine.classList.toggle("is-listening", phase === DEMO_PHASE.LISTENING);
+      this.refs.liveLine.classList.toggle("is-processing", phase === DEMO_PHASE.PROCESSING);
+      this.refs.liveLine.classList.toggle("is-emphasis", phase === DEMO_PHASE.SUCCESS);
     }
 
-    if (this.refs.liveInline) {
-      const isActive = phase !== DEMO_PHASE.IDLE;
-      this.refs.liveInline.classList.toggle("is-hidden", !isActive);
-    }
-
-    if (this.refs.rawCaret) {
-      const showCaret = phase === DEMO_PHASE.LISTENING;
-      this.refs.rawCaret.classList.toggle("is-hidden", !showCaret);
-    }
-
-    if (this.refs.rawLine) {
-      const dimRaw = phase === DEMO_PHASE.PROCESSING;
-      this.refs.rawLine.classList.toggle("is-dim", dimRaw);
-    }
-
-    if (this.refs.cleanLine) {
-      this.refs.cleanLine.classList.toggle("is-emphasis", phase === DEMO_PHASE.SUCCESS);
+    if (this.refs.caret) {
+      this.refs.caret.classList.toggle("is-hidden", phase === DEMO_PHASE.IDLE || phase === DEMO_PHASE.SUCCESS);
     }
 
     this.setSpinnerState(phase);
@@ -721,32 +666,6 @@ class DemoPlayback {
     });
   }
 
-  async typeInto(element, text, token, baseDelay = 26) {
-    if (!element) {
-      return true;
-    }
-
-    element.textContent = "";
-
-    for (let index = 1; index <= text.length; index += 1) {
-      if (token !== this.token) {
-        return false;
-      }
-
-      element.textContent = text.slice(0, index);
-
-      const char = text[index - 1] || "";
-      const punctuationPause = /[,.?!]/.test(char) ? 44 : char === " " ? 18 : 0;
-      const jitter = (Math.random() - 0.5) * 14;
-      const ok = await this.waitFor(Math.max(14, baseDelay + punctuationPause + jitter), token);
-      if (!ok) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   async run(token) {
     this.token = token;
     const scenario = DEMO_SCENARIOS[this.activeKey];
@@ -757,55 +676,52 @@ class DemoPlayback {
 
     if (this.reducedMotion) {
       this.setPhase(DEMO_PHASE.SUCCESS, scenario);
-      if (this.refs.raw) {
-        this.refs.raw.textContent = scenario.raw;
-      }
-      if (this.refs.clean) {
-        this.refs.clean.textContent = scenario.clean;
+      if (this.refs.liveText) {
+        this.refs.liveText.textContent = scenario.clean;
       }
       return;
     }
 
     while (token === this.token) {
-      if (this.refs.raw) {
-        this.refs.raw.textContent = "";
-      }
-      if (this.refs.clean) {
-        this.refs.clean.textContent = "";
+      if (this.refs.liveText) {
+        this.refs.liveText.textContent = "";
       }
 
       this.setPhase(DEMO_PHASE.IDLE, scenario);
-      if (!(await this.waitFor(680, token))) {
+      if (!(await this.waitFor(560, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.LISTENING, scenario);
-      const rawComplete = await this.typeInto(this.refs.raw, scenario.raw, token, 24);
-      if (!rawComplete) {
-        return;
+      if (this.refs.liveText) {
+        this.refs.liveText.textContent = "";
       }
-
-      if (!(await this.waitFor(140, token))) {
+      if (!(await this.waitFor(960, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.PROCESSING, scenario);
-      if (!(await this.waitFor(720, token))) {
+      if (this.refs.liveText) {
+        this.refs.liveText.textContent = "";
+      }
+      if (!(await this.waitFor(100, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.SUCCESS, scenario);
-      const cleanComplete = await this.typeInto(this.refs.clean, scenario.clean, token, 12);
-      if (!cleanComplete) {
-        return;
+      if (this.refs.liveText) {
+        this.refs.liveText.textContent = scenario.clean;
       }
 
-      if (!(await this.waitFor(900, token))) {
+      if (!(await this.waitFor(1400, token))) {
         return;
       }
 
       this.setPhase(DEMO_PHASE.IDLE, scenario);
-      if (!(await this.waitFor(1300, token))) {
+      if (this.refs.liveText) {
+        this.refs.liveText.textContent = "";
+      }
+      if (!(await this.waitFor(840, token))) {
         return;
       }
     }
@@ -848,7 +764,57 @@ function initDemoContextSwitcher() {
   });
 }
 
+function initThemeToggle() {
+  const root = document.documentElement;
+  const button = document.getElementById("theme-toggle");
+
+  if (!button) {
+    return;
+  }
+
+  const storedTheme = window.localStorage.getItem("theme");
+  const queryTheme = new URLSearchParams(window.location.search).get("theme");
+  const initialTheme = queryTheme === "light" || queryTheme === "dark" ? queryTheme : storedTheme;
+
+  if (initialTheme === "light" || initialTheme === "dark") {
+    root.setAttribute("data-theme", initialTheme);
+    window.localStorage.setItem("theme", initialTheme);
+  }
+
+  const updateButton = () => {
+    const isLight = root.getAttribute("data-theme") === "light";
+    button.textContent = isLight ? "Dark mode" : "Light mode";
+    button.setAttribute("aria-pressed", String(isLight));
+  };
+
+  button.addEventListener("click", () => {
+    const isLight = root.getAttribute("data-theme") === "light";
+    const nextTheme = isLight ? "dark" : "light";
+    root.setAttribute("data-theme", nextTheme);
+    window.localStorage.setItem("theme", nextTheme);
+    updateButton();
+  });
+
+  updateButton();
+}
+
+function initAppMarquee() {
+  const marquee = document.querySelector(".app-marquee");
+  const track = marquee?.querySelector(".app-track");
+
+  if (!marquee || !track) {
+    return;
+  }
+
+  const clone = track.cloneNode(true);
+  clone.classList.add("is-clone");
+  clone.setAttribute("aria-hidden", "true");
+  marquee.append(clone);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  initThemeToggle();
+  initAppMarquee();
   initDemoContextSwitcher();
   initSavingsCalculator();
 });

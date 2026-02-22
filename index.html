@@ -6,7 +6,7 @@
     <title>thinkur | Voice Interface for Mac</title>
     <meta
       name="description"
-      content="thinkur for macOS. Think your thoughts. Interface with your machine through voice. On-device, no account, £29 one-time."
+      content="thinkur for macOS. Don't type, just speak. The voice-to-text AI for clear, polished writing in every app."
     />
     <meta name="theme-color" content="#090909" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,7 +25,10 @@
           <span>thinkur</span>
         </a>
 
-        <a class="button button-primary" href="#download">Download for Mac - £29</a>
+        <div class="nav-actions">
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color mode">Light mode</button>
+          <a class="button button-primary" href="#download">Download for Mac - £29</a>
+        </div>
       </nav>
     </header>
 
@@ -34,10 +37,8 @@
         <div class="hero-layout">
           <div class="hero-copy">
             <p class="kicker">macOS only</p>
-            <h1>Think your thoughts. Interface with your machine through voice.</h1>
-            <p class="lead">
-              Instant processing. No cloud lag. No account. Clean text appears at your cursor in every app.
-            </p>
+            <h1>Don't type, just speak.</h1>
+            <p class="lead">The voice-to-text AI that turns speech into clear, polished writing in every app.</p>
 
             <div class="price-line">
               <p class="price">£29 one-time</p>
@@ -60,31 +61,26 @@
             </div>
           </div>
 
-          <aside class="hero-demo" aria-labelledby="demo-title">
-            <div class="demo-head">
-              <p class="demo-kicker" id="demo-title">Live app preview</p>
-              <p class="demo-sub">Click tabs to switch context.</p>
-            </div>
-
+          <aside class="hero-demo" aria-label="Interactive app preview">
             <div class="demo-tabs" role="tablist" aria-label="Preview contexts">
               <button type="button" class="demo-tab is-active" data-demo-key="terminal" role="tab" aria-selected="true">
-                <img src="./assets/icons/terminal.png" alt="" width="14" height="14" />
+                <img src="./assets/icons/terminal.png" alt="" width="18" height="18" />
                 Terminal
               </button>
               <button type="button" class="demo-tab" data-demo-key="firefox" role="tab" aria-selected="false">
-                <img src="./assets/icons/firefox.png" alt="" width="14" height="14" />
+                <img src="./assets/icons/firefox.png" alt="" width="18" height="18" />
                 Firefox
               </button>
               <button type="button" class="demo-tab" data-demo-key="messages" role="tab" aria-selected="false">
-                <img src="./assets/icons/messages.png" alt="" width="14" height="14" />
+                <img src="./assets/icons/messages.png" alt="" width="18" height="18" />
                 Messages
               </button>
               <button type="button" class="demo-tab" data-demo-key="slack" role="tab" aria-selected="false">
-                <img src="./assets/icons/slack.png" alt="" width="14" height="14" />
+                <img src="./assets/icons/slack.png" alt="" width="18" height="18" />
                 Slack
               </button>
               <button type="button" class="demo-tab" data-demo-key="notes" role="tab" aria-selected="false">
-                <img src="./assets/icons/notes.png" alt="" width="14" height="14" />
+                <img src="./assets/icons/notes.png" alt="" width="18" height="18" />
                 Notes
               </button>
             </div>
@@ -98,21 +94,42 @@
         <div class="section-head">
           <p class="kicker">coverage</p>
           <h2 id="apps-title">Works in every app you already use.</h2>
+          <p class="section-note">Use Thinkur anywhere on macOS. Faster than cloud alternatives.</p>
         </div>
 
-        <div class="app-grid">
-          <div class="app-chip"><img src="./assets/icons/terminal.png" alt="" width="20" height="20" /><span>Terminal</span></div>
-          <div class="app-chip"><img src="./assets/icons/firefox.png" alt="" width="20" height="20" /><span>Firefox</span></div>
-          <div class="app-chip"><img src="./assets/icons/messages.png" alt="" width="20" height="20" /><span>Messages</span></div>
-          <div class="app-chip"><img src="./assets/icons/slack.png" alt="" width="20" height="20" /><span>Slack</span></div>
-          <div class="app-chip"><img src="./assets/icons/notes.png" alt="" width="20" height="20" /><span>Notes</span></div>
-          <div class="app-chip"><img src="./assets/icons/mail.png" alt="" width="20" height="20" /><span>Mail</span></div>
-          <div class="app-chip"><img src="./assets/icons/gmail.svg" alt="" width="20" height="20" /><span>Gmail</span></div>
-          <div class="app-chip"><img src="./assets/icons/googledocs.svg" alt="" width="20" height="20" /><span>Docs</span></div>
-          <div class="app-chip"><img src="./assets/icons/notion.svg" alt="" width="20" height="20" /><span>Notion</span></div>
-          <div class="app-chip"><img src="./assets/icons/cursor.png" alt="" width="20" height="20" /><span>Cursor</span></div>
-          <div class="app-chip"><img src="./assets/icons/vscode.png" alt="" width="20" height="20" /><span>VS Code</span></div>
-          <div class="app-chip"><img src="./assets/icons/xcode.png" alt="" width="20" height="20" /><span>Xcode</span></div>
+        <div class="app-marquee" aria-label="Supported apps banner">
+          <div class="app-track">
+            <div class="app-chip"><img src="./assets/icons/terminal.png" alt="" width="20" height="20" /><span>Terminal</span></div>
+            <div class="app-chip"><img src="./assets/icons/firefox.png" alt="" width="20" height="20" /><span>Firefox</span></div>
+            <div class="app-chip"><img src="./assets/icons/messages.png" alt="" width="20" height="20" /><span>Messages</span></div>
+            <div class="app-chip"><img src="./assets/icons/slack.png" alt="" width="20" height="20" /><span>Slack</span></div>
+            <div class="app-chip"><img src="./assets/icons/notes.png" alt="" width="20" height="20" /><span>Notes</span></div>
+            <div class="app-chip"><img src="./assets/icons/mail.png" alt="" width="20" height="20" /><span>Mail</span></div>
+            <div class="app-chip"><img src="./assets/icons/gmail.svg" alt="" width="20" height="20" /><span>Gmail</span></div>
+            <div class="app-chip"><img src="./assets/icons/googledocs.svg" alt="" width="20" height="20" /><span>Docs</span></div>
+            <div class="app-chip"><img src="./assets/icons/notion.svg" alt="" width="20" height="20" /><span>Notion</span></div>
+            <div class="app-chip"><img src="./assets/icons/cursor.png" alt="" width="20" height="20" /><span>Cursor</span></div>
+            <div class="app-chip"><img src="./assets/icons/vscode.png" alt="" width="20" height="20" /><span>VS Code</span></div>
+            <div class="app-chip"><img src="./assets/icons/xcode.png" alt="" width="20" height="20" /><span>Xcode</span></div>
+            <div class="app-chip"><img src="./assets/icons/teams.png" alt="" width="20" height="20" /><span>Teams</span></div>
+            <div class="app-chip"><img src="./assets/icons/zoom.png" alt="" width="20" height="20" /><span>Zoom</span></div>
+            <div class="app-chip"><img src="./assets/icons/outlook.png" alt="" width="20" height="20" /><span>Outlook</span></div>
+            <div class="app-chip"><img src="./assets/icons/word.png" alt="" width="20" height="20" /><span>Word</span></div>
+            <div class="app-chip"><img src="./assets/icons/excel.png" alt="" width="20" height="20" /><span>Excel</span></div>
+            <div class="app-chip"><img src="./assets/icons/powerpoint.png" alt="" width="20" height="20" /><span>PowerPoint</span></div>
+            <div class="app-chip"><img src="./assets/icons/calendar.png" alt="" width="20" height="20" /><span>Calendar</span></div>
+            <div class="app-chip"><img src="./assets/icons/drive.png" alt="" width="20" height="20" /><span>Drive</span></div>
+            <div class="app-chip"><img src="./assets/icons/jira.png" alt="" width="20" height="20" /><span>Jira</span></div>
+            <div class="app-chip"><img src="./assets/icons/confluence.png" alt="" width="20" height="20" /><span>Confluence</span></div>
+            <div class="app-chip"><img src="./assets/icons/asana.png" alt="" width="20" height="20" /><span>Asana</span></div>
+            <div class="app-chip"><img src="./assets/icons/trello.png" alt="" width="20" height="20" /><span>Trello</span></div>
+            <div class="app-chip"><img src="./assets/icons/salesforce.png" alt="" width="20" height="20" /><span>Salesforce</span></div>
+            <div class="app-chip"><img src="./assets/icons/figma.png" alt="" width="20" height="20" /><span>Figma</span></div>
+            <div class="app-chip"><img src="./assets/icons/canva.png" alt="" width="20" height="20" /><span>Canva</span></div>
+            <div class="app-chip"><img src="./assets/icons/whatsapp.png" alt="" width="20" height="20" /><span>WhatsApp</span></div>
+            <div class="app-chip"><img src="./assets/icons/telegram.png" alt="" width="20" height="20" /><span>Telegram</span></div>
+            <div class="app-chip"><img src="./assets/icons/discord.png" alt="" width="20" height="20" /><span>Discord</span></div>
+          </div>
         </div>
       </section>
 
