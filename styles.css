@@ -535,10 +535,16 @@ h3,
   border: 1px solid var(--line-soft);
   border-radius: 12px;
   color: #dddee5;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   min-height: 272px;
   padding: 14px;
+}
+
+.preview-terminal::after {
+  content: "";
+  flex: 1;
 }
 
 .terminal-command,
@@ -558,7 +564,7 @@ h3,
 .terminal-live {
   color: #e8e9ee;
   display: block;
-  min-height: 176px;
+  min-height: 0;
   padding: 0;
 }
 
