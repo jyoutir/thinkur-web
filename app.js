@@ -841,16 +841,20 @@ function initDownloadButtons() {
         window.location.href = dmgUrl;
         return;
       }
+      const fallback = "https://github.com/jyoutir/thinkur-web/releases/latest";
       try {
         const res = await fetch("https://api.github.com/repos/jyoutir/thinkur-web/releases/latest");
+        if (!res.ok) throw new Error(res.status);
         const data = await res.json();
         const asset = data.assets.find((a) => a.name.endsWith(".dmg"));
-        if (asset) {
+        if (asset && asset.browser_download_url) {
           dmgUrl = asset.browser_download_url;
           window.location.href = dmgUrl;
+        } else {
+          window.location.href = fallback;
         }
       } catch {
-        window.location.href = "https://github.com/jyoutir/thinkur-web/releases/latest";
+        window.location.href = fallback;
       }
     });
   });
