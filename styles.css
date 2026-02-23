@@ -1,5 +1,5 @@
 :root {
-  --bg: #090909;
+  --bg: #0a0a0e;
   --bg-soft: #0f0f10;
   --surface: #141416;
   --surface-2: #19191c;
@@ -17,7 +17,7 @@
 }
 
 [data-theme="light"] {
-  --bg: #f5f5f7;
+  --bg: #f6f5f8;
   --bg-soft: #ffffff;
   --surface: #ffffff;
   --surface-2: #fbfbfc;
@@ -80,12 +80,12 @@ h3,
   z-index: 20;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background: rgba(9, 9, 9, 0.86);
+  background: rgba(10, 10, 14, 0.86);
   border-bottom: 1px solid var(--line-soft);
 }
 
 [data-theme="light"] .nav-wrap {
-  background: rgba(245, 245, 247, 0.88);
+  background: rgba(246, 245, 248, 0.88);
 }
 
 .nav {
@@ -166,6 +166,8 @@ h3,
   background: var(--ink);
   border-color: var(--ink);
   color: #0c0c0d;
+  overflow: hidden;
+  position: relative;
 }
 
 .button-primary:hover {
@@ -192,7 +194,7 @@ h3,
 .section {
   margin: 0 auto;
   max-width: var(--maxw);
-  padding: 74px 24px;
+  padding: 96px 24px;
 }
 
 .kicker {
@@ -1638,7 +1640,7 @@ h3,
 
 @media (max-width: 960px) {
   .section {
-    padding: 60px 22px;
+    padding: 76px 22px;
   }
 
   .hero-layout,
@@ -1714,7 +1716,7 @@ h3,
   }
 
   .section {
-    padding: 50px 16px;
+    padding: 60px 16px;
   }
 
   .section-hero {
@@ -1794,5 +1796,133 @@ h3,
 
   .money-row input {
     font-size: 1.85rem;
+  }
+}
+
+/* ── Cloud canvas ───────────────────────────────────────── */
+
+.cloud-canvas {
+  height: 100vh;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  inset: 0;
+  opacity: 0.08;
+  pointer-events: none;
+  position: fixed;
+  width: 100vw;
+  z-index: 0;
+}
+
+[data-theme="light"] .cloud-canvas {
+  opacity: 0.06;
+}
+
+/* ── Stacking: content above canvas ─────────────────────── */
+
+main,
+.footer {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Film grain overlay ─────────────────────────────────── */
+
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  height: 200%;
+  left: -50%;
+  opacity: 0.035;
+  pointer-events: none;
+  position: fixed;
+  top: -50%;
+  width: 200%;
+  z-index: 100;
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+/* ── Scroll reveal ──────────────────────────────────────── */
+
+.animate-in {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.animate-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger > *:nth-child(1) { transition-delay: 0.04s; }
+.stagger > *:nth-child(2) { transition-delay: 0.08s; }
+.stagger > *:nth-child(3) { transition-delay: 0.12s; }
+.stagger > *:nth-child(4) { transition-delay: 0.16s; }
+.stagger > *:nth-child(5) { transition-delay: 0.20s; }
+.stagger > *:nth-child(6) { transition-delay: 0.24s; }
+.stagger > *:nth-child(7) { transition-delay: 0.28s; }
+.stagger > *:nth-child(8) { transition-delay: 0.32s; }
+
+/* ── Button shine sweep ─────────────────────────────────── */
+
+.button-primary::after {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.25) 55%,
+    transparent 60%
+  );
+  content: "";
+  height: 100%;
+  left: -100%;
+  position: absolute;
+  top: 0;
+  transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.button-primary:hover::after {
+  left: 100%;
+}
+
+[data-theme="light"] .button-primary::after {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 60%
+  );
+}
+
+/* ── Reduced motion overrides ───────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay {
+    animation: none;
+  }
+
+  .animate-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .button-primary::after {
+    display: none;
   }
 }

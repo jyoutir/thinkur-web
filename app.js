@@ -860,10 +860,180 @@ function initDownloadButtons() {
   });
 }
 
+// ── Simplex 2D noise (self-contained, no deps) ──────────────────────────────
+
+const SimplexNoise = (() => {
+  const F2 = 0.5 * (Math.sqrt(3) - 1);
+  const G2 = (3 - Math.sqrt(3)) / 6;
+  const grad = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];
+
+  function build(seed) {
+    const p = new Uint8Array(256);
+    for (let i = 0; i < 256; i++) p[i] = i;
+    let s = seed | 0;
+    for (let i = 255; i > 0; i--) {
+      s = (s * 16807 + 0) & 0x7fffffff;
+      const j = s % (i + 1);
+      [p[i], p[j]] = [p[j], p[i]];
+    }
+    const perm = new Uint8Array(512);
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+    return perm;
+  }
+
+  return function (seed) {
+    const perm = build(seed || 42);
+    return function noise2D(x, y) {
+      const s = (x + y) * F2;
+      const i = Math.floor(x + s), j = Math.floor(y + s);
+      const t = (i + j) * G2;
+      const x0 = x - (i - t), y0 = y - (j - t);
+      const i1 = x0 > y0 ? 1 : 0, j1 = x0 > y0 ? 0 : 1;
+      const x1 = x0 - i1 + G2, y1 = y0 - j1 + G2;
+      const x2 = x0 - 1 + 2 * G2, y2 = y0 - 1 + 2 * G2;
+      const ii = i & 255, jj = j & 255;
+      let n = 0;
+      let t0 = 0.5 - x0*x0 - y0*y0;
+      if (t0 > 0) { t0 *= t0; const g = grad[perm[ii + perm[jj]] % 8]; n += t0 * t0 * (g[0]*x0 + g[1]*y0); }
+      let t1 = 0.5 - x1*x1 - y1*y1;
+      if (t1 > 0) { t1 *= t1; const g = grad[perm[ii + i1 + perm[jj + j1]] % 8]; n += t1 * t1 * (g[0]*x1 + g[1]*y1); }
+      let t2 = 0.5 - x2*x2 - y2*y2;
+      if (t2 > 0) { t2 *= t2; const g = grad[perm[ii + 1 + perm[jj + 1]] % 8]; n += t2 * t2 * (g[0]*x2 + g[1]*y2); }
+      return 70 * n;
+    };
+  };
+})();
+
+// ── Bayer 4x4 dithering matrix ───────────────────────────────────────────────
+
+const BAYER4 = [
+  [ 0, 8, 2,10],
+  [12, 4,14, 6],
+  [ 3,11, 1, 9],
+  [15, 7,13, 5]
+];
+
+// ── Cloud background ─────────────────────────────────────────────────────────
+
+function initCloudBackground() {
+  const W = 280, H = 160;
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  canvas.className = "cloud-canvas";
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.prepend(canvas);
+
+  const ctx = canvas.getContext("2d");
+  const imgData = ctx.createImageData(W, H);
+  const data = imgData.data;
+  const noise = SimplexNoise(37);
+  const noise2 = SimplexNoise(91);
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let lastFrame = 0;
+
+  function render(time) {
+    const root = document.documentElement;
+    const isLight = root.getAttribute("data-theme") === "light";
+    const on = isLight ? [20, 20, 35] : [255, 255, 255];
+    const drift = time * 0.000025;
+
+    for (let y = 0; y < H; y++) {
+      // vertical fade — clouds denser near top, thin at bottom
+      const yRatio = y / H;
+      const verticalFade = 1.0 - yRatio * yRatio * 0.7;
+
+      for (let x = 0; x < W; x++) {
+        // large cloud shapes (low frequency)
+        const nx = x * 0.008 + drift;
+        const ny = y * 0.012;
+        const base = noise(nx, ny);
+
+        // medium detail
+        const med = noise(nx * 2.5 + 7.3, ny * 2.5 + 3.1) * 0.4;
+
+        // fine detail (wispy edges)
+        const fine = noise2(nx * 5.0 + 2.7, ny * 5.0 + 8.4) * 0.18;
+
+        // combine: push toward cloud-like distribution
+        // base noise gives big puffy shapes, med/fine add texture
+        let val = base + med + fine; // range roughly -1.58 to 1.58
+
+        // shape into clouds: use a bias so only the peaks form clouds
+        // this creates clear sky (off) with distinct cloud blobs (on)
+        val = val * verticalFade;
+
+        // cloud threshold — only values above this become visible pixels
+        // higher = fewer/smaller clouds, lower = more coverage
+        const cloudCutoff = 0.25;
+        const density = Math.max(0, (val - cloudCutoff) / (1.58 - cloudCutoff));
+
+        // bayer dithering on the density value
+        const bayerThreshold = BAYER4[y & 3][x & 3] / 16;
+        const on_px = density > bayerThreshold;
+
+        const idx = (y * W + x) * 4;
+        data[idx]     = on[0];
+        data[idx + 1] = on[1];
+        data[idx + 2] = on[2];
+        data[idx + 3] = on_px ? 255 : 0;
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  function loop(time) {
+    if (time - lastFrame >= 66) {
+      lastFrame = time;
+      render(time);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  if (reducedMotion) {
+    render(0);
+  } else {
+    render(0);
+    requestAnimationFrame(loop);
+  }
+}
+
+// ── Scroll reveal ────────────────────────────────────────────────────────────
+
+function initScrollReveal() {
+  const els = document.querySelectorAll(".animate-in");
+  if (!els.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reducedMotion) {
+    els.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+  );
+
+  els.forEach((el) => observer.observe(el));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
   initDemoContextSwitcher();
   initSavingsCalculator();
   initDownloadButtons();
+  initCloudBackground();
+  initScrollReveal();
 });
