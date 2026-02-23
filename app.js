@@ -9,6 +9,9 @@ const DEMO_PHASE = {
   SUCCESS: "success"
 };
 
+// shared state — demo playback writes, cloud canvas reads
+const demoGlow = { phase: "idle", changedAt: 0 };
+
 const DEMO_SCENARIOS = {
   terminal: {
     title: "Terminal",
@@ -641,6 +644,10 @@ class DemoPlayback {
     }
 
     this.setSpinnerState(phase);
+
+    // broadcast to cloud canvas
+    demoGlow.phase = phase;
+    demoGlow.changedAt = performance.now();
   }
 
   waitFor(ms, token) {
@@ -904,19 +911,23 @@ const SimplexNoise = (() => {
   };
 })();
 
-// ── Bayer 4x4 dithering matrix ───────────────────────────────────────────────
+// ── Bayer 8x8 dithering matrix (64 threshold levels) ─────────────────────────
 
-const BAYER4 = [
-  [ 0, 8, 2,10],
-  [12, 4,14, 6],
-  [ 3,11, 1, 9],
-  [15, 7,13, 5]
+const BAYER8 = [
+  [ 0, 32,  8, 40,  2, 34, 10, 42],
+  [48, 16, 56, 24, 50, 18, 58, 26],
+  [12, 44,  4, 36, 14, 46,  6, 38],
+  [60, 28, 52, 20, 62, 30, 54, 22],
+  [ 3, 35, 11, 43,  1, 33,  9, 41],
+  [51, 19, 59, 27, 49, 17, 57, 25],
+  [15, 47,  7, 39, 13, 45,  5, 37],
+  [63, 31, 55, 23, 61, 29, 53, 21]
 ];
 
 // ── Cloud background ─────────────────────────────────────────────────────────
 
 function initCloudBackground() {
-  const W = 280, H = 160;
+  const W = 400, H = 240;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -928,56 +939,192 @@ function initCloudBackground() {
   const imgData = ctx.createImageData(W, H);
   const data = imgData.data;
   const noise = SimplexNoise(37);
-  const noise2 = SimplexNoise(91);
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let lastFrame = 0;
+
+  // mouse tracking for hover interaction
+  let mouseX = -1, mouseY = -1;
+  let smoothMouseX = -1, smoothMouseY = -1;
+  const HOVER_INNER = 18;   // bright core radius
+  const HOVER_OUTER = 42;   // soft outer glow radius
+  const HOVER_OUTER_SQ = HOVER_OUTER * HOVER_OUTER;
+
+  window.addEventListener("mousemove", (e) => {
+    mouseX = (e.clientX / window.innerWidth) * W;
+    mouseY = (e.clientY / window.innerHeight) * H;
+  }, { passive: true });
+
+  window.addEventListener("mouseleave", () => {
+    mouseX = -1;
+    mouseY = -1;
+  });
+
+  // HSL → RGB (h, s, l in 0–1, returns [r, g, b] in 0–255)
+  function hsl(h, s, l) {
+    const a = s * Math.min(l, 1 - l);
+    const f = (n) => {
+      const k = (n + h * 12) % 12;
+      return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    };
+    return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+  }
+
+  // 5-octave fractal Brownian motion
+  function fbm(x, y) {
+    let val = 0;
+    val += noise(x, y) * 0.5;
+    val += noise(x * 2, y * 2) * 0.25;
+    val += noise(x * 4, y * 4) * 0.125;
+    val += noise(x * 8, y * 8) * 0.0625;
+    val += noise(x * 16, y * 16) * 0.03125;
+    return val;
+  }
+
+  // smoothstep S-curve for dramatic contrast
+  function contrast(v) {
+    const c = Math.max(0, Math.min(1, v));
+    return c * c * (3 - 2 * c);
+  }
 
   function render(time) {
     const root = document.documentElement;
     const isLight = root.getAttribute("data-theme") === "light";
     const on = isLight ? [20, 20, 35] : [255, 255, 255];
-    const drift = time * 0.000025;
+
+    // smooth mouse interpolation for fluid glow movement
+    if (mouseX >= 0) {
+      if (smoothMouseX < 0) { smoothMouseX = mouseX; smoothMouseY = mouseY; }
+      smoothMouseX += (mouseX - smoothMouseX) * 0.18;
+      smoothMouseY += (mouseY - smoothMouseY) * 0.18;
+    } else {
+      smoothMouseX = -1;
+      smoothMouseY = -1;
+    }
+
+    const drift = time * 0.000018;
+    const warpStrength = 1.1;
+
+    // ── demo glow: locate the demo preview in canvas space ──
+    let demoCX = -1, demoCY = -1, demoElapsed = 0;
+    const demoActive = demoGlow.phase !== "idle";
+    if (demoActive) {
+      const el = document.getElementById("app-preview");
+      if (el) {
+        const r = el.getBoundingClientRect();
+        demoCX = ((r.left + r.width / 2) / window.innerWidth) * W;
+        demoCY = ((r.top + r.height / 2) / window.innerHeight) * H;
+      }
+      demoElapsed = (time - demoGlow.changedAt) / 1000;
+    }
 
     for (let y = 0; y < H; y++) {
-      // vertical fade — clouds denser near top, thin at bottom
+      // gentle vertical bias — denser at top and bottom, thinner in middle
       const yRatio = y / H;
-      const verticalFade = 1.0 - yRatio * yRatio * 0.7;
+      const verticalBias = 1.0 - 0.25 * Math.sin(yRatio * Math.PI);
 
       for (let x = 0; x < W; x++) {
-        // large cloud shapes (low frequency)
-        const nx = x * 0.008 + drift;
-        const ny = y * 0.012;
-        const base = noise(nx, ny);
+        const nx = x * 0.005 + drift;
+        const ny = y * 0.006;
 
-        // medium detail
-        const med = noise(nx * 2.5 + 7.3, ny * 2.5 + 3.1) * 0.4;
+        // domain warping — warp coordinates with noise for organic swirling shapes
+        const warpX = fbm(nx + 0.0, ny + 0.0) * warpStrength;
+        const warpY = fbm(nx + 5.2, ny + 1.3) * warpStrength;
+        let val = fbm(nx + warpX, ny + warpY);
 
-        // fine detail (wispy edges)
-        const fine = noise2(nx * 5.0 + 2.7, ny * 5.0 + 8.4) * 0.18;
+        // normalize from fBm range (~-0.47 to 0.47) to 0–1
+        val = (val + 0.5) * verticalBias;
 
-        // combine: push toward cloud-like distribution
-        // base noise gives big puffy shapes, med/fine add texture
-        let val = base + med + fine; // range roughly -1.58 to 1.58
+        // shift coverage — lower cutoff = more clouds filling the frame
+        val = Math.max(0, (val - 0.08) / 0.92);
 
-        // shape into clouds: use a bias so only the peaks form clouds
-        // this creates clear sky (off) with distinct cloud blobs (on)
-        val = val * verticalFade;
+        // double S-curve contrast for dramatic light/dark separation
+        val = contrast(contrast(val));
 
-        // cloud threshold — only values above this become visible pixels
-        // higher = fewer/smaller clouds, lower = more coverage
-        const cloudCutoff = 0.25;
-        const density = Math.max(0, (val - cloudCutoff) / (1.58 - cloudCutoff));
-
-        // bayer dithering on the density value
-        const bayerThreshold = BAYER4[y & 3][x & 3] / 16;
-        const on_px = density > bayerThreshold;
+        // multi-tonal 8x8 ordered dithering
+        const threshold = BAYER8[y & 7][x & 7] / 64;
+        const on_px = val > threshold;
 
         const idx = (y * W + x) * 4;
-        data[idx]     = on[0];
-        data[idx + 1] = on[1];
-        data[idx + 2] = on[2];
-        data[idx + 3] = on_px ? 255 : 0;
+
+        // ── default: base cloud pixel ──
+        let pxR = on[0], pxG = on[1], pxB = on[2], pxA = on_px ? 255 : 0;
+
+        // ── mouse hover: bold dithered rainbow in negative space ──
+        if (!on_px && smoothMouseX >= 0) {
+          const dx = x - smoothMouseX;
+          const dy = y - smoothMouseY;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < HOVER_OUTER_SQ) {
+            const dist = Math.sqrt(distSq);
+            const outerT = 1 - dist / HOVER_OUTER;
+            const glow = outerT * outerT * 1.1;
+
+            const angle = Math.atan2(dy, dx);
+            const hue = ((angle / (Math.PI * 2) + 0.5) + time * 0.00004) % 1;
+            const sat = isLight ? 0.8 : 0.9;
+            const lit = isLight ? 0.48 : 0.62;
+            const [cr, cg, cb] = hsl(hue, sat, lit);
+
+            if (glow > threshold) {
+              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+            }
+          }
+        }
+
+        // ── demo glow: colored pulse from demo preview area ──
+        if (!on_px && pxA === 0 && demoActive && demoCX >= 0) {
+          const dx = x - demoCX;
+          const dy = y - demoCY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          let intensity = 0;
+
+          if (demoGlow.phase === "listening") {
+            // breathing green glow — radius pulses with sine
+            const breathRadius = 55 + 10 * Math.sin(demoElapsed * 2.5);
+            if (dist < breathRadius) {
+              const t = 1 - dist / breathRadius;
+              intensity = t * t * 0.7;
+            }
+          } else if (demoGlow.phase === "success") {
+            // expanding ring burst
+            const ringCenter = demoElapsed * 130;
+            const ringWidth = 20;
+            const distFromRing = Math.abs(dist - ringCenter);
+            if (distFromRing < ringWidth && demoElapsed < 1.2) {
+              const ringT = 1 - distFromRing / ringWidth;
+              const fade = Math.max(0, 1 - demoElapsed / 1.2);
+              intensity = ringT * ringT * fade * 0.85;
+            }
+          } else if (demoGlow.phase === "processing") {
+            // tight cool pulse
+            const pulseRadius = 35;
+            if (dist < pulseRadius) {
+              const t = 1 - dist / pulseRadius;
+              intensity = t * t * 0.4 * (0.6 + 0.4 * Math.sin(demoElapsed * 8));
+            }
+          }
+
+          if (intensity > threshold) {
+            // phase-based color
+            if (demoGlow.phase === "listening") {
+              const [cr, cg, cb] = hsl(0.38, 0.75, isLight ? 0.42 : 0.58);
+              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+            } else if (demoGlow.phase === "success") {
+              const [cr, cg, cb] = hsl(0.36, 0.85, isLight ? 0.48 : 0.65);
+              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+            } else {
+              const [cr, cg, cb] = hsl(0.58, 0.5, isLight ? 0.45 : 0.6);
+              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+            }
+          }
+        }
+
+        data[idx]     = pxR;
+        data[idx + 1] = pxG;
+        data[idx + 2] = pxB;
+        data[idx + 3] = pxA;
       }
     }
 
