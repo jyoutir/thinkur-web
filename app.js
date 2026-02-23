@@ -950,6 +950,15 @@ function initCloudBackground() {
     for (let c = 0; c < 8; c++)
       bayerFlat[(r << 3) | c] = BAYER8[r][c] / 64;
 
+  // pre-compute per-row vertical bias
+  const vertBias = new Float64Array(H);
+  for (let y = 0; y < H; y++)
+    vertBias[y] = 1.0 - 0.25 * Math.sin((y / H) * Math.PI);
+
+  // cached cloud field — noise is expensive, drift is slow
+  const cloudField = new Float32Array(W * H);
+  let fieldTime = -Infinity;
+
   // mouse tracking
   let mouseX = -1, mouseY = -1;
   let smoothMouseX = -1, smoothMouseY = -1;
@@ -1003,7 +1012,37 @@ function initCloudBackground() {
   // cache demo element ref
   let demoEl = null;
 
+  // ── expensive: recompute cloud noise field (called at ~5fps) ──
+  function updateField(time) {
+    const drift = time * 0.000018;
+    for (let y = 0; y < H; y++) {
+      const bias = vertBias[y];
+      const ny = y * 0.006;
+      const row = y * W;
+      for (let x = 0; x < W; x++) {
+        const nx = x * 0.005 + drift;
+        const wX = fbmWarp(nx, ny) * 1.1;
+        const wY = fbmWarp(nx + 5.2, ny + 1.3) * 1.1;
+        let v = fbm(nx + wX, ny + wY);
+        v = (v + 0.5) * bias;
+        v = v > 0.08 ? (v - 0.08) * 1.0869565217 : 0;
+        v = v < 0 ? 0 : v > 1 ? 1 : v;
+        v = v * v * (3 - 2 * v);
+        v = v * v * (3 - 2 * v);
+        cloudField[row + x] = v;
+      }
+    }
+    fieldTime = time;
+  }
+
+  // ── cheap: composite cached field + overlays (called at ~25fps) ──
   function render(time) {
+    // skip if tab is hidden
+    if (document.hidden) return;
+
+    // refresh noise field every 200ms (~5fps)
+    if (time - fieldTime >= 80) updateField(time);
+
     const root = document.documentElement;
     const isLight = root.getAttribute("data-theme") === "light";
     const onR = isLight ? 20 : 255, onG = isLight ? 20 : 255, onB = isLight ? 35 : 255;
@@ -1022,7 +1061,6 @@ function initCloudBackground() {
       smoothMouseY = -1;
     }
 
-    const drift = time * 0.000018;
     const hoverActive = smoothMouseX >= 0;
     const hoverSat = isLight ? 0.85 : 0.95;
     const hoverLit = isLight ? 0.45 : 0.58;
@@ -1044,49 +1082,28 @@ function initCloudBackground() {
       }
       demoElapsed = (time - demoGlow.changedAt) / 1000;
 
-      // pre-compute phase color + max radius for early bailout
       if (demoPhase === "listening") {
         hslCalc(0.38, 0.75, isLight ? 0.42 : 0.58);
-        const mr = 65;
-        demoMaxRadSq = mr * mr;
+        demoMaxRadSq = 4225;
       } else if (demoPhase === "success") {
         hslCalc(0.36, 0.85, isLight ? 0.48 : 0.65);
         const mr = demoElapsed * 130 + 20;
         demoMaxRadSq = mr * mr;
       } else {
         hslCalc(0.58, 0.5, isLight ? 0.45 : 0.6);
-        demoMaxRadSq = 35 * 35;
+        demoMaxRadSq = 1225;
       }
       demoPacked = pack(hR, hG, hB, 255);
     }
 
     for (let y = 0; y < H; y++) {
-      // ── hoist per-row constants ──
-      const verticalBias = 1.0 - 0.25 * Math.sin((y / H) * Math.PI);
-      const ny = y * 0.006;
       const bayerRow = (y & 7) << 3;
       const rowOffset = y * W;
 
       for (let x = 0; x < W; x++) {
-        const nx = x * 0.005 + drift;
-
-        // domain warping — 3-octave fBm for warp, 5-octave for value
-        const warpX = fbmWarp(nx, ny) * 1.1;
-        const warpY = fbmWarp(nx + 5.2, ny + 1.3) * 1.1;
-        let val = fbm(nx + warpX, ny + warpY);
-
-        // normalize + coverage + double smoothstep contrast
-        val = (val + 0.5) * verticalBias;
-        val = val > 0.08 ? (val - 0.08) * 1.0869565217 : 0; // 1/0.92
-        // inline double smoothstep
-        val = val < 0 ? 0 : val > 1 ? 1 : val;
-        val = val * val * (3 - 2 * val);
-        val = val * val * (3 - 2 * val);
-
-        // Bayer dither
-        const threshold = bayerFlat[bayerRow | (x & 7)];
-        const on_px = val > threshold;
         const pi = rowOffset + x;
+        const threshold = bayerFlat[bayerRow | (x & 7)];
+        const on_px = cloudField[pi] > threshold;
 
         if (on_px) {
           buf32[pi] = onPacked;
@@ -1095,7 +1112,6 @@ function initCloudBackground() {
 
         // ── non-cloud pixel: check hover + demo glow ──
 
-        // mouse hover — dithered rainbow in negative space
         if (hoverActive) {
           const dx = x - smoothMouseX;
           const dy = y - smoothMouseY;
@@ -1113,7 +1129,6 @@ function initCloudBackground() {
           }
         }
 
-        // demo glow — colored pulse from demo preview
         if (demoActive && demoCX >= 0) {
           const dx = x - demoCX;
           const dy = y - demoCY;
@@ -1135,11 +1150,9 @@ function initCloudBackground() {
                 const ringT = 1 - distFromRing / 20;
                 intensity = ringT * ringT * Math.max(0, 1 - demoElapsed / 1.2) * 0.85;
               }
-            } else {
-              if (dist < 35) {
-                const t = 1 - dist / 35;
-                intensity = t * t * 0.4 * (0.6 + 0.4 * Math.sin(demoElapsed * 8));
-              }
+            } else if (dist < 35) {
+              const t = 1 - dist / 35;
+              intensity = t * t * 0.4 * (0.6 + 0.4 * Math.sin(demoElapsed * 8));
             }
 
             if (intensity > threshold) {
@@ -1149,7 +1162,7 @@ function initCloudBackground() {
           }
         }
 
-        buf32[pi] = 0; // transparent
+        buf32[pi] = 0;
       }
     }
 

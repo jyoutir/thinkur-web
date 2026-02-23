@@ -274,13 +274,28 @@ h3,
   text-decoration: line-through;
 }
 
-.facts {
-  color: var(--muted);
+.value-points {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+}
+
+.value-points li {
+  align-items: baseline;
+  color: var(--ink);
+  display: flex;
   font-size: 0.95rem;
-  letter-spacing: 0.01em;
-  line-height: 1.6;
-  margin: 18px 0 0;
-  max-width: 42ch;
+  font-weight: 500;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.value-points li::before {
+  color: var(--muted-2);
+  content: "—";
+  flex-shrink: 0;
 }
 
 .hero-actions {
