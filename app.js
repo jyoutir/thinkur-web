@@ -832,9 +832,34 @@ function initAppMarquee() {
   window.addEventListener("resize", syncWidth, { passive: true });
 }
 
+function initDownloadButtons() {
+  let dmgUrl = null;
+  document.querySelectorAll("[data-download]").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (dmgUrl) {
+        window.location.href = dmgUrl;
+        return;
+      }
+      try {
+        const res = await fetch("https://api.github.com/repos/jyoutir/thinkur-web/releases/latest");
+        const data = await res.json();
+        const asset = data.assets.find((a) => a.name.endsWith(".dmg"));
+        if (asset) {
+          dmgUrl = asset.browser_download_url;
+          window.location.href = dmgUrl;
+        }
+      } catch {
+        window.location.href = "https://github.com/jyoutir/thinkur-web/releases/latest";
+      }
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
   initDemoContextSwitcher();
   initSavingsCalculator();
+  initDownloadButtons();
 });
