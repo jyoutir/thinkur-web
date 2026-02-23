@@ -953,6 +953,7 @@ function initCloudBackground() {
   // mouse tracking
   let mouseX = -1, mouseY = -1;
   let smoothMouseX = -1, smoothMouseY = -1;
+  let hueAccum = 0;
   const HOVER_INNER = 35;
   const HOVER_OUTER = 80;
   const HOVER_OUTER_SQ = HOVER_OUTER * HOVER_OUTER;
@@ -1011,8 +1012,11 @@ function initCloudBackground() {
     // smooth mouse interpolation
     if (mouseX >= 0) {
       if (smoothMouseX < 0) { smoothMouseX = mouseX; smoothMouseY = mouseY; }
-      smoothMouseX += (mouseX - smoothMouseX) * 0.18;
-      smoothMouseY += (mouseY - smoothMouseY) * 0.18;
+      const dx = mouseX - smoothMouseX;
+      const dy = mouseY - smoothMouseY;
+      hueAccum += Math.sqrt(dx * dx + dy * dy) * 0.0015;
+      smoothMouseX += dx * 0.55;
+      smoothMouseY += dy * 0.55;
     } else {
       smoothMouseX = -1;
       smoothMouseY = -1;
@@ -1022,7 +1026,7 @@ function initCloudBackground() {
     const hoverActive = smoothMouseX >= 0;
     const hoverSat = isLight ? 0.85 : 0.95;
     const hoverLit = isLight ? 0.45 : 0.58;
-    const timeHue = time * 0.00004;
+    const timeHue = hueAccum;
 
     // ── demo glow setup (once per frame) ──
     let demoCX = -1, demoCY = -1, demoElapsed = 0;
@@ -1099,7 +1103,7 @@ function initCloudBackground() {
           if (distSq < HOVER_OUTER_SQ) {
             const dist = Math.sqrt(distSq);
             const outerT = 1 - dist / HOVER_OUTER;
-            const glow = outerT * outerT * 1.4;
+            const glow = Math.min(outerT * outerT * 1.4, 0.92);
             if (glow > threshold) {
               const hue = ((Math.atan2(dy, dx) / (Math.PI * 2) + 0.5) + timeHue) % 1;
               hslCalc(hue, hoverSat, hoverLit);
@@ -1153,7 +1157,7 @@ function initCloudBackground() {
   }
 
   function loop(time) {
-    if (time - lastFrame >= 66) {
+    if (time - lastFrame >= 40) {
       lastFrame = time;
       render(time);
     }
