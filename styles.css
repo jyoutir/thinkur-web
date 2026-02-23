@@ -203,6 +203,37 @@ h3,
   border-color: var(--ink);
 }
 
+.button-rainbow {
+  border: 0;
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(135deg, #ff6b6b, #ffa94d, #ffd43b, #69db7c, #74c0fc, #b197fc, #ff6b6b) border-box;
+  background-size: 100% 100%, 200% 200%;
+  border: 1.5px solid transparent;
+  animation: rainbow-shift 4s linear infinite;
+  font-weight: 800;
+}
+
+.button-rainbow:hover {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(135deg, #ff6b6b, #ffa94d, #ffd43b, #69db7c, #74c0fc, #b197fc, #ff6b6b) border-box;
+  background-size: 100% 100%, 200% 200%;
+  animation: rainbow-shift 2s linear infinite;
+}
+
+@keyframes rainbow-shift {
+  0% { background-position: 0 0, 0% 50%; }
+  100% { background-position: 0 0, 200% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-rainbow {
+    animation: none;
+  }
+}
+
 .button-large {
   min-height: 50px;
   padding: 0 22px;
