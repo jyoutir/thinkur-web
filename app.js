@@ -762,6 +762,16 @@ function initDemoContextSwitcher() {
     });
   });
 
+  const tabsContainer = buttons[0]?.parentElement;
+  if (tabsContainer) {
+    const checkScrollEnd = () => {
+      const atEnd = tabsContainer.scrollLeft + tabsContainer.clientWidth >= tabsContainer.scrollWidth - 4;
+      tabsContainer.classList.toggle("is-scrolled-end", atEnd);
+    };
+    tabsContainer.addEventListener("scroll", checkScrollEnd, { passive: true });
+    checkScrollEnd();
+  }
+
   const requestedKey = new URLSearchParams(window.location.search).get("demo");
   const defaultKey = buttons.find((button) => button.classList.contains("is-active"))?.dataset.demoKey || "terminal";
   const initialKey = requestedKey && DEMO_SCENARIOS[requestedKey] ? requestedKey : defaultKey;
@@ -976,6 +986,19 @@ function initCloudBackground() {
     mouseX = -1;
     mouseY = -1;
   });
+
+  document.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
+    if (touch) {
+      mouseX = (touch.clientX / window.innerWidth) * W;
+      mouseY = (touch.clientY / window.innerHeight) * H;
+    }
+  }, { passive: true });
+
+  document.addEventListener("touchend", () => {
+    mouseX = -1;
+    mouseY = -1;
+  }, { passive: true });
 
   // HSL → RGB — writes to shared vars, zero allocation
   let hR = 0, hG = 0, hB = 0;
