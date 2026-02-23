@@ -286,6 +286,24 @@ h3,
   display: grid;
   gap: 3px;
   line-height: 1.35;
+  padding: 6px 0 6px 12px;
+  border-left: 2px solid transparent;
+  transform: translateX(0);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  cursor: default;
+}
+
+.value-points li:hover {
+  transform: translateX(6px);
+  border-left-color: #b48eff;
+}
+
+.value-points li:hover strong {
+  -webkit-text-fill-color: #b48eff;
+}
+
+.value-points li:hover span {
+  color: var(--ink);
 }
 
 .value-points strong {
@@ -293,8 +311,8 @@ h3,
     90deg,
     var(--muted) 0%,
     var(--muted) calc(50% - 4em),
-    var(--ink) calc(50% - 0.6em),
-    var(--ink) calc(50% + 0.6em),
+    #b48eff calc(50% - 0.6em),
+    #b48eff calc(50% + 0.6em),
     var(--muted) calc(50% + 4em),
     var(--muted) 100%
   );
@@ -308,6 +326,7 @@ h3,
   font-weight: 700;
   letter-spacing: -0.02em;
   animation: text-shimmer 4s linear infinite;
+  transition: -webkit-text-fill-color 0.25s ease;
 }
 
 @keyframes text-shimmer {
@@ -318,19 +337,28 @@ h3,
 .value-points li span {
   color: var(--muted);
   font-size: 0.88rem;
+  transition: color 0.25s ease;
 }
 
 .value-points li:nth-child(2) strong { animation-delay: 1s; }
 .value-points li:nth-child(3) strong { animation-delay: 2s; }
 .value-points li:nth-child(4) strong { animation-delay: 3s; }
 
+[data-theme="light"] .value-points li:hover {
+  border-left-color: #7c3aed;
+}
+
+[data-theme="light"] .value-points li:hover strong {
+  -webkit-text-fill-color: #7c3aed;
+}
+
 [data-theme="light"] .value-points strong {
   background: linear-gradient(
     90deg,
     var(--muted) 0%,
     var(--muted) calc(50% - 4em),
-    var(--ink) calc(50% - 0.6em),
-    var(--ink) calc(50% + 0.6em),
+    #7c3aed calc(50% - 0.6em),
+    #7c3aed calc(50% + 0.6em),
     var(--muted) calc(50% + 4em),
     var(--muted) 100%
   );
