@@ -938,16 +938,23 @@ function initCloudBackground() {
   const ctx = canvas.getContext("2d");
   const imgData = ctx.createImageData(W, H);
   const data = imgData.data;
+  const buf32 = new Uint32Array(imgData.data.buffer); // 1 write per pixel
   const noise = SimplexNoise(37);
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let lastFrame = 0;
 
-  // mouse tracking for hover interaction
+  // flatten Bayer matrix — 1 lookup instead of 2
+  const bayerFlat = new Float64Array(64);
+  for (let r = 0; r < 8; r++)
+    for (let c = 0; c < 8; c++)
+      bayerFlat[(r << 3) | c] = BAYER8[r][c] / 64;
+
+  // mouse tracking
   let mouseX = -1, mouseY = -1;
   let smoothMouseX = -1, smoothMouseY = -1;
-  const HOVER_INNER = 18;   // bright core radius
-  const HOVER_OUTER = 42;   // soft outer glow radius
+  const HOVER_INNER = 35;
+  const HOVER_OUTER = 80;
   const HOVER_OUTER_SQ = HOVER_OUTER * HOVER_OUTER;
 
   window.addEventListener("mousemove", (e) => {
@@ -960,39 +967,48 @@ function initCloudBackground() {
     mouseY = -1;
   });
 
-  // HSL → RGB (h, s, l in 0–1, returns [r, g, b] in 0–255)
-  function hsl(h, s, l) {
+  // HSL → RGB — writes to shared vars, zero allocation
+  let hR = 0, hG = 0, hB = 0;
+  function hslCalc(h, s, l) {
     const a = s * Math.min(l, 1 - l);
-    const f = (n) => {
-      const k = (n + h * 12) % 12;
-      return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
-    };
-    return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+    const h12 = h * 12;
+    const k0 = (h12) % 12;
+    const k8 = (8 + h12) % 12;
+    const k4 = (4 + h12) % 12;
+    hR = ((l - a * Math.max(-1, Math.min(k0 - 3, 9 - k0, 1))) * 255 + 0.5) | 0;
+    hG = ((l - a * Math.max(-1, Math.min(k8 - 3, 9 - k8, 1))) * 255 + 0.5) | 0;
+    hB = ((l - a * Math.max(-1, Math.min(k4 - 3, 9 - k4, 1))) * 255 + 0.5) | 0;
   }
 
-  // 5-octave fractal Brownian motion
+  // pack RGBA into uint32 (little-endian: ABGR byte order)
+  function pack(r, g, b, a) {
+    return (a << 24) | (b << 16) | (g << 8) | r;
+  }
+
+  // 3-octave fBm for warp (doesn't need fine detail)
+  function fbmWarp(x, y) {
+    return noise(x, y) * 0.5 + noise(x * 2, y * 2) * 0.25 + noise(x * 4, y * 4) * 0.125;
+  }
+
+  // 5-octave fBm for final value
   function fbm(x, y) {
-    let val = 0;
-    val += noise(x, y) * 0.5;
-    val += noise(x * 2, y * 2) * 0.25;
-    val += noise(x * 4, y * 4) * 0.125;
-    val += noise(x * 8, y * 8) * 0.0625;
-    val += noise(x * 16, y * 16) * 0.03125;
-    return val;
+    return noise(x, y) * 0.5
+      + noise(x * 2, y * 2) * 0.25
+      + noise(x * 4, y * 4) * 0.125
+      + noise(x * 8, y * 8) * 0.0625
+      + noise(x * 16, y * 16) * 0.03125;
   }
 
-  // smoothstep S-curve for dramatic contrast
-  function contrast(v) {
-    const c = Math.max(0, Math.min(1, v));
-    return c * c * (3 - 2 * c);
-  }
+  // cache demo element ref
+  let demoEl = null;
 
   function render(time) {
     const root = document.documentElement;
     const isLight = root.getAttribute("data-theme") === "light";
-    const on = isLight ? [20, 20, 35] : [255, 255, 255];
+    const onR = isLight ? 20 : 255, onG = isLight ? 20 : 255, onB = isLight ? 35 : 255;
+    const onPacked = pack(onR, onG, onB, 255);
 
-    // smooth mouse interpolation for fluid glow movement
+    // smooth mouse interpolation
     if (mouseX >= 0) {
       if (smoothMouseX < 0) { smoothMouseX = mouseX; smoothMouseY = mouseY; }
       smoothMouseX += (mouseX - smoothMouseX) * 0.18;
@@ -1003,128 +1019,133 @@ function initCloudBackground() {
     }
 
     const drift = time * 0.000018;
-    const warpStrength = 1.1;
+    const hoverActive = smoothMouseX >= 0;
+    const hoverSat = isLight ? 0.85 : 0.95;
+    const hoverLit = isLight ? 0.45 : 0.58;
+    const timeHue = time * 0.00004;
 
-    // ── demo glow: locate the demo preview in canvas space ──
+    // ── demo glow setup (once per frame) ──
     let demoCX = -1, demoCY = -1, demoElapsed = 0;
-    const demoActive = demoGlow.phase !== "idle";
+    const demoPhase = demoGlow.phase;
+    const demoActive = demoPhase !== "idle";
+    let demoMaxRadSq = 0;
+    let demoPacked = 0;
+
     if (demoActive) {
-      const el = document.getElementById("app-preview");
-      if (el) {
-        const r = el.getBoundingClientRect();
+      if (!demoEl) demoEl = document.getElementById("app-preview");
+      if (demoEl) {
+        const r = demoEl.getBoundingClientRect();
         demoCX = ((r.left + r.width / 2) / window.innerWidth) * W;
         demoCY = ((r.top + r.height / 2) / window.innerHeight) * H;
       }
       demoElapsed = (time - demoGlow.changedAt) / 1000;
+
+      // pre-compute phase color + max radius for early bailout
+      if (demoPhase === "listening") {
+        hslCalc(0.38, 0.75, isLight ? 0.42 : 0.58);
+        const mr = 65;
+        demoMaxRadSq = mr * mr;
+      } else if (demoPhase === "success") {
+        hslCalc(0.36, 0.85, isLight ? 0.48 : 0.65);
+        const mr = demoElapsed * 130 + 20;
+        demoMaxRadSq = mr * mr;
+      } else {
+        hslCalc(0.58, 0.5, isLight ? 0.45 : 0.6);
+        demoMaxRadSq = 35 * 35;
+      }
+      demoPacked = pack(hR, hG, hB, 255);
     }
 
     for (let y = 0; y < H; y++) {
-      // gentle vertical bias — denser at top and bottom, thinner in middle
-      const yRatio = y / H;
-      const verticalBias = 1.0 - 0.25 * Math.sin(yRatio * Math.PI);
+      // ── hoist per-row constants ──
+      const verticalBias = 1.0 - 0.25 * Math.sin((y / H) * Math.PI);
+      const ny = y * 0.006;
+      const bayerRow = (y & 7) << 3;
+      const rowOffset = y * W;
 
       for (let x = 0; x < W; x++) {
         const nx = x * 0.005 + drift;
-        const ny = y * 0.006;
 
-        // domain warping — warp coordinates with noise for organic swirling shapes
-        const warpX = fbm(nx + 0.0, ny + 0.0) * warpStrength;
-        const warpY = fbm(nx + 5.2, ny + 1.3) * warpStrength;
+        // domain warping — 3-octave fBm for warp, 5-octave for value
+        const warpX = fbmWarp(nx, ny) * 1.1;
+        const warpY = fbmWarp(nx + 5.2, ny + 1.3) * 1.1;
         let val = fbm(nx + warpX, ny + warpY);
 
-        // normalize from fBm range (~-0.47 to 0.47) to 0–1
+        // normalize + coverage + double smoothstep contrast
         val = (val + 0.5) * verticalBias;
+        val = val > 0.08 ? (val - 0.08) * 1.0869565217 : 0; // 1/0.92
+        // inline double smoothstep
+        val = val < 0 ? 0 : val > 1 ? 1 : val;
+        val = val * val * (3 - 2 * val);
+        val = val * val * (3 - 2 * val);
 
-        // shift coverage — lower cutoff = more clouds filling the frame
-        val = Math.max(0, (val - 0.08) / 0.92);
-
-        // double S-curve contrast for dramatic light/dark separation
-        val = contrast(contrast(val));
-
-        // multi-tonal 8x8 ordered dithering
-        const threshold = BAYER8[y & 7][x & 7] / 64;
+        // Bayer dither
+        const threshold = bayerFlat[bayerRow | (x & 7)];
         const on_px = val > threshold;
+        const pi = rowOffset + x;
 
-        const idx = (y * W + x) * 4;
+        if (on_px) {
+          buf32[pi] = onPacked;
+          continue;
+        }
 
-        // ── default: base cloud pixel ──
-        let pxR = on[0], pxG = on[1], pxB = on[2], pxA = on_px ? 255 : 0;
+        // ── non-cloud pixel: check hover + demo glow ──
 
-        // ── mouse hover: bold dithered rainbow in negative space ──
-        if (!on_px && smoothMouseX >= 0) {
+        // mouse hover — dithered rainbow in negative space
+        if (hoverActive) {
           const dx = x - smoothMouseX;
           const dy = y - smoothMouseY;
           const distSq = dx * dx + dy * dy;
           if (distSq < HOVER_OUTER_SQ) {
             const dist = Math.sqrt(distSq);
             const outerT = 1 - dist / HOVER_OUTER;
-            const glow = outerT * outerT * 1.1;
-
-            const angle = Math.atan2(dy, dx);
-            const hue = ((angle / (Math.PI * 2) + 0.5) + time * 0.00004) % 1;
-            const sat = isLight ? 0.8 : 0.9;
-            const lit = isLight ? 0.48 : 0.62;
-            const [cr, cg, cb] = hsl(hue, sat, lit);
-
+            const glow = outerT * outerT * 1.4;
             if (glow > threshold) {
-              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+              const hue = ((Math.atan2(dy, dx) / (Math.PI * 2) + 0.5) + timeHue) % 1;
+              hslCalc(hue, hoverSat, hoverLit);
+              buf32[pi] = pack(hR, hG, hB, 255);
+              continue;
             }
           }
         }
 
-        // ── demo glow: colored pulse from demo preview area ──
-        if (!on_px && pxA === 0 && demoActive && demoCX >= 0) {
+        // demo glow — colored pulse from demo preview
+        if (demoActive && demoCX >= 0) {
           const dx = x - demoCX;
           const dy = y - demoCY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
+          if (distSq < demoMaxRadSq) {
+            const dist = Math.sqrt(distSq);
+            let intensity = 0;
 
-          let intensity = 0;
-
-          if (demoGlow.phase === "listening") {
-            // breathing green glow — radius pulses with sine
-            const breathRadius = 55 + 10 * Math.sin(demoElapsed * 2.5);
-            if (dist < breathRadius) {
-              const t = 1 - dist / breathRadius;
-              intensity = t * t * 0.7;
-            }
-          } else if (demoGlow.phase === "success") {
-            // expanding ring burst
-            const ringCenter = demoElapsed * 130;
-            const ringWidth = 20;
-            const distFromRing = Math.abs(dist - ringCenter);
-            if (distFromRing < ringWidth && demoElapsed < 1.2) {
-              const ringT = 1 - distFromRing / ringWidth;
-              const fade = Math.max(0, 1 - demoElapsed / 1.2);
-              intensity = ringT * ringT * fade * 0.85;
-            }
-          } else if (demoGlow.phase === "processing") {
-            // tight cool pulse
-            const pulseRadius = 35;
-            if (dist < pulseRadius) {
-              const t = 1 - dist / pulseRadius;
-              intensity = t * t * 0.4 * (0.6 + 0.4 * Math.sin(demoElapsed * 8));
-            }
-          }
-
-          if (intensity > threshold) {
-            // phase-based color
-            if (demoGlow.phase === "listening") {
-              const [cr, cg, cb] = hsl(0.38, 0.75, isLight ? 0.42 : 0.58);
-              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
-            } else if (demoGlow.phase === "success") {
-              const [cr, cg, cb] = hsl(0.36, 0.85, isLight ? 0.48 : 0.65);
-              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+            if (demoPhase === "listening") {
+              const breathRadius = 55 + 10 * Math.sin(demoElapsed * 2.5);
+              if (dist < breathRadius) {
+                const t = 1 - dist / breathRadius;
+                intensity = t * t * 0.7;
+              }
+            } else if (demoPhase === "success") {
+              const ringCenter = demoElapsed * 130;
+              const distFromRing = Math.abs(dist - ringCenter);
+              if (distFromRing < 20 && demoElapsed < 1.2) {
+                const ringT = 1 - distFromRing / 20;
+                intensity = ringT * ringT * Math.max(0, 1 - demoElapsed / 1.2) * 0.85;
+              }
             } else {
-              const [cr, cg, cb] = hsl(0.58, 0.5, isLight ? 0.45 : 0.6);
-              pxR = cr; pxG = cg; pxB = cb; pxA = 255;
+              if (dist < 35) {
+                const t = 1 - dist / 35;
+                intensity = t * t * 0.4 * (0.6 + 0.4 * Math.sin(demoElapsed * 8));
+              }
+            }
+
+            if (intensity > threshold) {
+              buf32[pi] = demoPacked;
+              continue;
             }
           }
         }
 
-        data[idx]     = pxR;
-        data[idx + 1] = pxG;
-        data[idx + 2] = pxB;
-        data[idx + 3] = pxA;
+        buf32[pi] = 0; // transparent
       }
     }
 
