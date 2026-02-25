@@ -1899,7 +1899,11 @@ h3,
   .nav-divider { display: none; }
   .nav-links { gap: 14px; }
   .nav-buttons { gap: 6px; }
-  .theme-toggle { height: 32px; width: 32px; }
+  .theme-toggle { height: 44px; width: 44px; }
+
+  .slider { height: 16px; }
+  .slider::-webkit-slider-thumb { height: 44px; width: 44px; }
+  .slider::-moz-range-thumb { height: 44px; width: 44px; }
 
   .button {
     font-size: 0.76rem;
@@ -1917,8 +1921,17 @@ h3,
 
   .hero-copy h1 {
     font-size: clamp(1.75rem, 10.2vw, 2.55rem);
-    line-height: 0.94;
+    line-height: 1.12;
     max-width: none;
+  }
+
+  .section-head h2,
+  .value-copy h2 {
+    line-height: 1.1;
+  }
+
+  .testers-copy h2 {
+    line-height: 1.1;
   }
 
   .lead {
@@ -2000,6 +2013,14 @@ h3,
   .money-row input {
     font-size: 1.85rem;
   }
+
+  .tally-embed {
+    min-height: 320px;
+  }
+
+  .tally-embed iframe {
+    min-height: 300px;
+  }
 }
 
 /* ── Touch-device hover overrides ──────────────────────── */
@@ -2026,6 +2047,13 @@ h3,
   .value-points li:hover span {
     color: var(--muted);
   }
+
+  .value-points strong {
+    animation: none;
+    -webkit-text-fill-color: unset;
+    background: none;
+    color: var(--ink);
+  }
 }
 
 /* ── Short viewport (landscape phones) ────────────────── */
@@ -2049,7 +2077,7 @@ h3,
 
 @media (max-width: 500px) {
   .nav-wrap {
-    width: calc(100% - 16px);
+    width: calc(100% - 24px);
     top: 6px;
   }
 
@@ -2066,16 +2094,25 @@ h3,
   .button-ghost {
     display: none;
   }
-  .theme-toggle { height: 30px; width: 30px; }
+
+  .button-rainbow {
+    display: flex;
+    font-size: 0.68rem;
+    min-height: 36px;
+    padding: 0 10px;
+    order: -1;
+  }
+
+  .theme-toggle { height: 44px; width: 44px; }
 
   .button {
     font-size: 0.74rem;
-    min-height: 36px;
+    min-height: 44px;
     padding: 0 10px;
   }
 
   .section {
-    padding: 44px 12px;
+    padding: 48px 16px;
   }
 
   .section-hero {
@@ -2084,6 +2121,7 @@ h3,
 
   .hero-copy h1 {
     font-size: clamp(1.6rem, 9.5vw, 2.2rem);
+    line-height: 1.15;
   }
 
   .lead {
@@ -2117,8 +2155,8 @@ h3,
 
   .demo-tab {
     font-size: 0.74rem;
-    min-height: 34px;
-    padding: 0 10px;
+    min-height: 44px;
+    padding: 0 12px;
     gap: 6px;
   }
 
@@ -2129,12 +2167,20 @@ h3,
 
   .demo-window,
   .window-frame {
-    min-height: 270px;
+    min-height: 240px;
+  }
+
+  .preview-terminal,
+  .preview-firefox,
+  .preview-messages,
+  .preview-slack,
+  .preview-notes {
+    min-height: 200px;
   }
 
   .app-marquee::before,
   .app-marquee::after {
-    width: 32px;
+    width: 48px;
   }
 
   .app-chip {
@@ -2156,14 +2202,15 @@ h3,
   .section-head h2,
   .value-copy h2 {
     font-size: clamp(1.8rem, 7vw, 2.8rem);
+    line-height: 1.12;
   }
 
   .savings-result {
-    padding: 14px;
+    padding: 16px;
   }
 
   .control-card {
-    padding: 12px;
+    padding: 16px;
   }
 
   .control-value {
@@ -2176,7 +2223,7 @@ h3,
   }
 
   .money-row input {
-    font-size: 1.65rem;
+    font-size: 1.5rem;
   }
 
   .compare-head,
@@ -2189,8 +2236,28 @@ h3,
   }
 
   .button-large {
-    min-height: 46px;
+    min-height: 48px;
     padding: 0 18px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .button-large {
+    width: 100%;
+  }
+
+  .close-cta {
+    flex-direction: column;
+  }
+
+  .close-cta .button-large {
+    width: 100%;
+  }
+
+  .micro {
+    font-size: 0.78rem;
   }
 
   .testers-layout {
@@ -2199,10 +2266,16 @@ h3,
 
   .testers-copy h2 {
     font-size: clamp(1.6rem, 7vw, 2.4rem);
+    line-height: 1.12;
   }
 
   .tally-embed {
     padding: 12px;
+    min-height: 280px;
+  }
+
+  .tally-embed iframe {
+    min-height: 260px;
   }
 }
 
@@ -2521,6 +2594,14 @@ h3,
   .changelog-badge {
     display: none;
   }
+
+  .changelog-header {
+    padding: 14px 16px;
+  }
+
+  .is-open .changelog-body {
+    padding: 14px 16px 16px;
+  }
 }
 
 /* ── Cloud canvas ───────────────────────────────────────── */
@@ -2530,6 +2611,7 @@ h3,
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   inset: 0;
+  object-fit: cover;
   opacity: 0.14;
   pointer-events: none;
   position: fixed;
