@@ -28,16 +28,32 @@
     <div class="grain-overlay" aria-hidden="true"></div>
     <header class="nav-wrap">
       <nav class="nav">
-        <a class="brand" href="#top" aria-label="thinkur home">
+        <a class="brand" href="/" aria-label="thinkur home">
           <img src="./assets/thinkur-icon.png" alt="thinkur logo" width="32" height="32" />
           <span>thinkur</span>
         </a>
 
         <div class="nav-actions">
-          <a class="nav-link" href="/changelog.html">Changelog</a>
-          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color mode">Light mode</button>
-          <a class="button button-ghost button-rainbow" href="#early-access">Free early access</a>
-          <a class="button button-primary" href="#" data-download>Download now</a>
+          <div class="nav-links">
+            <a class="nav-link" href="/changelog.html">Changelog</a>
+            <a class="nav-link" href="/blog.html">Blog</a>
+          </div>
+
+          <span class="nav-divider" aria-hidden="true"></span>
+
+          <div class="nav-buttons">
+            <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to light mode">
+              <svg class="icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <svg class="icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M13.36 10.06A6 6 0 015.94 2.64 6.5 6.5 0 1013.36 10.06z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <a class="button button-ghost button-rainbow" href="#early-access">Free early access</a>
+            <a class="button button-primary" href="#" data-download>Download now</a>
+          </div>
         </div>
       </nav>
     </header>
@@ -272,7 +288,7 @@
     </main>
 
     <footer class="footer animate-in">
-      <p>Built with care &amp; craft by <a href="https://jyoutir.com/" target="_blank" rel="noreferrer">jyo</a>. <a href="/changelog.html">Changelog</a></p>
+      <p>Built with care &amp; craft by <a href="https://jyoutir.com/" target="_blank" rel="noreferrer">jyo</a>. <a href="/changelog.html">Changelog</a> · <a href="/blog.html">Blog</a></p>
     </footer>
 
     <script type="module" src="./app.js"></script>

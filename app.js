@@ -801,7 +801,7 @@ function initThemeToggle() {
 
   const updateButton = () => {
     const isLight = root.getAttribute("data-theme") === "light";
-    button.textContent = isLight ? "Dark mode" : "Light mode";
+    button.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
     button.setAttribute("aria-pressed", String(isLight));
   };
 
