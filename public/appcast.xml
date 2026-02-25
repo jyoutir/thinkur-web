@@ -31,5 +31,25 @@
 ]]></description>
             <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.2/thinkur-1.0.2.dmg" length="4240243" type="application/octet-stream" sparkle:edSignature="sHAYm99IFPfQj3yV8IeT1IEVu+2biyKBKzuETBSa9GSj69SbLbdSdst2ybHJQI3gT8lZ/anJMoy+obbxZSb6Dg=="/>
         </item>
+        <item>
+            <title>1.0.1</title>
+            <pubDate>Sun, 23 Feb 2026 20:41:37 +0000</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description><![CDATA[<p>Bug fixes.</p>]]></description>
+            <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.1/thinkur-1.0.1.dmg" length="0" type="application/octet-stream"/>
+        </item>
+        <item>
+            <title>1.0.0</title>
+            <pubDate>Sun, 23 Feb 2026 18:32:09 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description><![CDATA[<p>Initial release of thinkur.</p>]]></description>
+            <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.0/thinkur-1.0.0.dmg" length="0" type="application/octet-stream"/>
+        </item>
     </channel>
 </rss>

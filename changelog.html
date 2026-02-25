@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Changelog | thinkur</title>
+    <meta name="description" content="What's new in each release of thinkur for macOS." />
+    <meta name="theme-color" content="#090909" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="grain-overlay" aria-hidden="true"></div>
+    <header class="nav-wrap">
+      <nav class="nav">
+        <a class="brand" href="/" aria-label="thinkur home">
+          <img src="./assets/thinkur-icon.png" alt="thinkur logo" width="32" height="32" />
+          <span>thinkur</span>
+        </a>
+        <div class="nav-actions">
+          <a class="nav-link is-active" href="/changelog.html">Changelog</a>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color mode">Light mode</button>
+          <a class="button button-primary" href="/">Back to home</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section section-changelog animate-in">
+        <p class="kicker">releases</p>
+        <h1 class="changelog-title">Changelog</h1>
+        <p class="lead">What's new in each release.</p>
+
+        <div id="changelog-entries" class="changelog-entries">
+          <p class="changelog-loading">Loading releases...</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer animate-in">
+      <p>Built with care &amp; craft by <a href="https://jyoutir.com/" target="_blank" rel="noreferrer">jyo</a>. <a href="/changelog.html">Changelog</a></p>
+    </footer>
+
+    <!-- Reuse app.js for cloud canvas, theme toggle, grain, scroll reveal -->
+    <script type="module" src="./app.js"></script>
+
+    <script>
+      // ── Changelog parser ──
+      // innerHTML renders HTML from same-origin, developer-authored appcast.xml
+      // with an allowlist sanitizer for safety.
+      (function () {
+        var container = document.getElementById("changelog-entries");
+        if (!container) return;
+
+        var ALLOWED_TAGS = ["H1","H2","H3","H4","P","UL","OL","LI","STRONG","EM","A","BR","CODE","PRE"];
+
+        function sanitizeHTML(html) {
+          var temp = document.createElement("div");
+          temp.innerHTML = html;
+          var walker = document.createTreeWalker(temp, NodeFilter.SHOW_ELEMENT);
+          var toRemove = [];
+          while (walker.nextNode()) {
+            var node = walker.currentNode;
+            if (ALLOWED_TAGS.indexOf(node.tagName) === -1) {
+              toRemove.push(node);
+            } else {
+              var attrs = Array.from(node.attributes);
+              for (var i = 0; i < attrs.length; i++) {
+                if (!(node.tagName === "A" && attrs[i].name === "href")) {
+                  node.removeAttribute(attrs[i].name);
+                }
+              }
+              if (node.tagName === "A") {
+                node.setAttribute("target", "_blank");
+                node.setAttribute("rel", "noreferrer");
+              }
+            }
+          }
+          for (var j = 0; j < toRemove.length; j++) {
+            var el = toRemove[j];
+            while (el.firstChild) el.parentNode.insertBefore(el.firstChild, el);
+            el.parentNode.removeChild(el);
+          }
+          return temp.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+          try {
+            var d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+          } catch (e) {
+            return dateStr;
+          }
+        }
+
+        function loadChangelog() {
+          fetch("/appcast.xml")
+            .then(function (res) {
+              if (!res.ok) throw new Error("Failed to fetch appcast.xml");
+              return res.text();
+            })
+            .then(function (xml) {
+              var parser = new DOMParser();
+              var doc = parser.parseFromString(xml, "application/xml");
+              var items = Array.from(doc.querySelectorAll("item"));
+
+              items.sort(function (a, b) {
+                var vA = Number(
+                  (a.getElementsByTagNameNS("http://www.andymatuschak.org/xml-namespaces/sparkle", "version")[0] || {}).textContent || "0"
+                );
+                var vB = Number(
+                  (b.getElementsByTagNameNS("http://www.andymatuschak.org/xml-namespaces/sparkle", "version")[0] || {}).textContent || "0"
+                );
+                return vB - vA;
+              });
+
+              if (items.length === 0) {
+                container.textContent = "No releases found.";
+                container.className = "changelog-entries changelog-empty";
+                return;
+              }
+
+              container.textContent = "";
+
+              items.forEach(function (item, index) {
+                var versionEl = item.getElementsByTagNameNS(
+                  "http://www.andymatuschak.org/xml-namespaces/sparkle",
+                  "shortVersionString"
+                )[0];
+                var version = versionEl
+                  ? versionEl.textContent
+                  : (item.querySelector("title") || {}).textContent || "Unknown";
+                var pubDate = (item.querySelector("pubDate") || {}).textContent || "";
+                var descEl = item.querySelector("description");
+                var descHTML = descEl ? descEl.textContent : "";
+                var isLatest = index === 0;
+
+                var entry = document.createElement("article");
+                entry.className = "changelog-entry" + (isLatest ? " is-open" : "");
+
+                // Header (clickable toggle)
+                var header = document.createElement("button");
+                header.type = "button";
+                header.className = "changelog-header";
+                header.setAttribute("aria-expanded", String(isLatest));
+
+                var headerLeft = document.createElement("div");
+                headerLeft.className = "changelog-header-left";
+
+                var vEl = document.createElement("h2");
+                vEl.className = "changelog-version";
+                vEl.textContent = "v" + version;
+
+                var dateEl = document.createElement("time");
+                dateEl.className = "changelog-date";
+                dateEl.textContent = formatDate(pubDate);
+                if (pubDate) {
+                  try { dateEl.setAttribute("datetime", new Date(pubDate).toISOString()); } catch (e) {}
+                }
+
+                headerLeft.appendChild(vEl);
+                headerLeft.appendChild(dateEl);
+
+                var headerRight = document.createElement("div");
+                headerRight.className = "changelog-header-right";
+
+                if (isLatest) {
+                  var badge = document.createElement("span");
+                  badge.className = "changelog-badge";
+                  badge.textContent = "Latest";
+                  headerRight.appendChild(badge);
+                }
+
+                var chevron = document.createElement("span");
+                chevron.className = "changelog-chevron";
+                chevron.setAttribute("aria-hidden", "true");
+                headerRight.appendChild(chevron);
+
+                header.appendChild(headerLeft);
+                header.appendChild(headerRight);
+
+                // Body (collapsible)
+                var bodyWrap = document.createElement("div");
+                bodyWrap.className = "changelog-body-wrap";
+
+                var body = document.createElement("div");
+                body.className = "changelog-body";
+                body.innerHTML = sanitizeHTML(descHTML);
+
+                bodyWrap.appendChild(body);
+
+                entry.appendChild(header);
+                entry.appendChild(bodyWrap);
+                container.appendChild(entry);
+
+                // Toggle
+                header.addEventListener("click", function () {
+                  var open = entry.classList.toggle("is-open");
+                  header.setAttribute("aria-expanded", String(open));
+                });
+              });
+            })
+            .catch(function () {
+              container.textContent = "Unable to load changelog. Please try again later.";
+              container.className = "changelog-entries changelog-empty";
+            });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", loadChangelog);
+        } else {
+          loadChangelog();
+        }
+      })();
+    </script>
+  </body>
+</html>
