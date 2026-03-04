@@ -1,6 +1,7 @@
-const WORKING_DAYS_PER_MONTH = 22;
-const SPEED_MULTIPLIER = 4;
-const DEFAULT_WPM = 40;
+const WORKING_DAYS_PER_MONTH = 21;
+const DEFAULT_HOURLY_RATE = 25;
+const TYPING_WPM = 45;
+const PROJECTED_DICTATION_WPM = 110;
 
 const DEMO_PHASE = {
   IDLE: "idle",
@@ -164,10 +165,11 @@ function formatCurrency(value) {
 }
 
 function computeSavings(hoursTypingPerDay, hourlyRate) {
-  const dailyHoursSaved = hoursTypingPerDay * (1 - 1 / SPEED_MULTIPLIER);
+  const wordsPerDay = Math.round(hoursTypingPerDay * 60 * TYPING_WPM);
+  const projectedDictationHours = (wordsPerDay / PROJECTED_DICTATION_WPM) / 60;
+  const dailyHoursSaved = Math.max(0, hoursTypingPerDay - projectedDictationHours);
   const monthlyHoursSaved = dailyHoursSaved * WORKING_DAYS_PER_MONTH;
   const monthlySavings = monthlyHoursSaved * hourlyRate;
-  const wordsPerDay = Math.round(hoursTypingPerDay * 60 * DEFAULT_WPM);
 
   return {
     monthlySavings,
@@ -202,13 +204,13 @@ function initSavingsCalculator() {
     const hoursTypingPerDay = clampNumber(Number(hoursSlider.value) || 2, 0.5, 8);
     const parsedRate = Number(hourlyRateInput.value);
     const hasRateError = !Number.isFinite(parsedRate) || parsedRate <= 0;
-    const hourlyRate = clampNumber(hasRateError ? 50 : parsedRate, 1, 100000);
+    const hourlyRate = clampNumber(hasRateError ? DEFAULT_HOURLY_RATE : parsedRate, 1, 100000);
 
     const { monthlySavings, monthlyHoursSaved, wordsPerDay } = computeSavings(hoursTypingPerDay, hourlyRate);
 
     hoursLabel.textContent = `${hoursTypingPerDay.toFixed(1)}h / day`;
     monthlySavingsEl.textContent = formatCurrency(monthlySavings);
-    hoursSavedEl.textContent = `${Math.round(monthlyHoursSaved)} hours`;
+    hoursSavedEl.textContent = `${monthlyHoursSaved.toFixed(1)} hours`;
     wordsDayEl.textContent = new Intl.NumberFormat("en-GB").format(wordsPerDay);
 
     hourlyRateError.hidden = !hasRateError;
