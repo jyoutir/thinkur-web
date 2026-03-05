@@ -3,53 +3,23 @@
     <channel>
         <title>thinkur</title>
         <item>
-            <title>1.0.2</title>
-            <pubDate>Wed, 25 Feb 2026 16:59:28 +0000</pubDate>
-            <sparkle:version>3</sparkle:version>
-            <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <title>1.0.3</title>
+            <pubDate>Thu, 05 Mar 2026 23:17:13 +0000</pubDate>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<h2>What's New</h2>
 
 <ul>
-<li><strong>Faster, more accurate transcription</strong> - Upgraded to an improved, and lighter, speech model</li>
-<li><strong>Better UX</strong> - Prettier in some areas</li>
-<li><strong>In-app checkout</strong> - Purchase flow now opens directly in the app</li>
-<li><strong>Clearer pricing page</strong> - Updated for clarity</li>
-</ul>
-
-<h2>Fixes</h2>
-
-<ul>
-<li>Fixed bottom bar positioning (requested by @eddie_08)</li>
-<li>Fixed window close behavior (requested by X: @johnway___)</li>
-<li>Improved permission flow with better error handling </li>
-<li>License activation improvements (requested by X: @johnway___)</li>
-<li>Show-in-dock setting + menu bar improvements </li>
-<li>Music dimming while recording is auto-enabled </li>
+<li>Meeting recording with speaker diarisation (for @Simon)</li>
+<li>thinkur MCP — let Claude, ChatGPT, and Cursor talk to your speech data</li>
+<li>Free tier — try thinkur without a license</li>
+<li>Reliable multi-key hotkeys</li>
+<li>Dropped minimum to macOS 15.0 (for @super_bavario)</li>
+<li>Bug fixes (thanks @johnway___, @fhreire)</li>
 </ul>
 ]]></description>
-            <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.2/thinkur-1.0.2.dmg" length="4240243" type="application/octet-stream" sparkle:edSignature="sHAYm99IFPfQj3yV8IeT1IEVu+2biyKBKzuETBSa9GSj69SbLbdSdst2ybHJQI3gT8lZ/anJMoy+obbxZSb6Dg=="/>
-        </item>
-        <item>
-            <title>1.0.1</title>
-            <pubDate>Sun, 23 Feb 2026 20:41:37 +0000</pubDate>
-            <sparkle:version>2</sparkle:version>
-            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description><![CDATA[<p>Bug fixes.</p>]]></description>
-            <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.1/thinkur-1.0.1.dmg" length="0" type="application/octet-stream"/>
-        </item>
-        <item>
-            <title>1.0.0</title>
-            <pubDate>Sun, 23 Feb 2026 18:32:09 +0000</pubDate>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description><![CDATA[<p>Initial release of thinkur.</p>]]></description>
-            <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.0/thinkur-1.0.0.dmg" length="0" type="application/octet-stream"/>
+            <enclosure url="https://github.com/jyoutir/thinkur-web/releases/download/v1.0.3/thinkur-1.0.3.dmg" length="6598874" type="application/octet-stream" sparkle:edSignature="SmOwpHKnvv3eQ9MsxznkIa7feqYuSFnyJ+p9wTzSfK074Tqr4RgBrKhja5w4tkaHYt4/rmAshY6ApGVJWg3iDQ=="/>
         </item>
     </channel>
 </rss>
