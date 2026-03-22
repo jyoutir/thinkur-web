@@ -1195,6 +1195,21 @@ h3,
   border-top: 1px solid var(--line-soft);
 }
 
+.demo-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.demo-gallery img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
 .app-marquee {
   display: block;
   margin-top: 18px;

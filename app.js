@@ -157,9 +157,9 @@ function clampNumber(value, min, max) {
 }
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat("en-GB", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "GBP",
+    currency: "USD",
     maximumFractionDigits: 0
   }).format(value);
 }
@@ -211,7 +211,7 @@ function initSavingsCalculator() {
     hoursLabel.textContent = `${hoursTypingPerDay.toFixed(1)}h / day`;
     monthlySavingsEl.textContent = formatCurrency(monthlySavings);
     hoursSavedEl.textContent = `${monthlyHoursSaved.toFixed(1)} hours`;
-    wordsDayEl.textContent = new Intl.NumberFormat("en-GB").format(wordsPerDay);
+    wordsDayEl.textContent = new Intl.NumberFormat("en-US").format(wordsPerDay);
 
     hourlyRateError.hidden = !hasRateError;
   };
