@@ -453,14 +453,10 @@ class DemoPlayback {
   }
 
   private waitFor(ms: number, token: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      const waiter = { timer: 0 as unknown as ReturnType<typeof setTimeout>, resolve: (_: boolean) => {} };
-      waiter.resolve = (ok: boolean) => {
-        this.pendingWaits.delete(waiter);
-        resolve(ok);
-      };
-      waiter.timer = setTimeout(() => waiter.resolve(token === this.token), ms);
-      this.pendingWaits.add(waiter);
+    return new Promise<boolean>((resolve) => {
+      const done = (ok: boolean) => { this.pendingWaits.delete(w); resolve(ok); };
+      const w = { timer: setTimeout(() => done(token === this.token), ms), resolve: done };
+      this.pendingWaits.add(w);
     });
   }
 
