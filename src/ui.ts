@@ -165,6 +165,20 @@ export function initAppMarquee(): void {
   window.addEventListener("resize", syncWidth, { passive: true });
 }
 
+// ── Testimonial marquee ──────────────────────────────
+
+export function initTestimonialMarquee(): void {
+  const track = document.querySelector(".testimonial-track");
+  const lane = track?.querySelector(".testimonial-lane");
+  if (!track || !lane) return;
+  if (track.querySelector(".testimonial-lane.is-clone")) return;
+
+  const clone = lane.cloneNode(true) as HTMLElement;
+  clone.classList.add("is-clone");
+  clone.setAttribute("aria-hidden", "true");
+  track.append(clone);
+}
+
 // ── Scroll reveal ────────────────────────────────────
 
 export function initScrollReveal(): void {

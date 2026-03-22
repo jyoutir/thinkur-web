@@ -15,6 +15,7 @@ import {
   initGitHubStars,
   initGitHubDownloads,
   initAppMarquee,
+  initTestimonialMarquee,
   initScrollReveal,
   initTabEasterEgg,
 } from "./ui";
@@ -22,6 +23,7 @@ import {
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
+  initTestimonialMarquee();
   initFeatureCards();
   initSavingsCalculator();
   initDownloadButtons();
