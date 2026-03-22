@@ -357,19 +357,25 @@
   display: grid;
   gap: var(--sp-2);
   grid-template-columns: 1fr 1fr;
-  max-width: 780px;
+  max-width: 860px;
   margin: var(--sp-4) auto 0;
 }
 
 .testimonial-card {
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: linear-gradient(165deg, #ffffff, #f6f6f9);
+  border: 1px solid #e0e0e6;
   border-radius: var(--radius-md);
-  padding: var(--sp-3);
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin: 0;
+  transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
 }
 
 .testimonial-featured {
@@ -377,7 +383,7 @@
 }
 
 .testimonial-text {
-  color: var(--ink);
+  color: #2a2a30;
   font-size: 0.95rem;
   line-height: 1.55;
   margin: 0;
@@ -391,14 +397,17 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #ebebf0;
 }
 
 .testimonial-name {
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  color: #121214;
 }
 
 .testimonial-name a,
@@ -414,7 +423,7 @@
 }
 
 .testimonial-role {
-  color: var(--muted);
+  color: #7a7a85;
   font-size: 0.85rem;
 }
 
@@ -1306,7 +1315,12 @@
   border-color: #dfdfe5;
 }
 
-[data-theme="light"] .testimonial-card,
+[data-theme="light"] .testimonial-card {
+  background: linear-gradient(165deg, #ffffff, #f9f9fc);
+  border-color: #d9d9e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 [data-theme="light"] .built-by {
   background: #ffffff;
   border-color: #d9d9e0;

@@ -111,6 +111,14 @@ export function initCloudBackground(): void {
 
   document.addEventListener("touchend", () => { mouseX = -1; mouseY = -1; }, { passive: true });
 
+  let scrolling = false;
+  let scrollTimer: ReturnType<typeof setTimeout>;
+  window.addEventListener("scroll", () => {
+    scrolling = true;
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => { scrolling = false; }, 150);
+  }, { passive: true });
+
   let hR = 0, hG = 0, hB = 0;
   function hslCalc(h: number, s: number, l: number): void {
     const a = s * Math.min(l, 1 - l);
@@ -270,7 +278,7 @@ export function initCloudBackground(): void {
   }
 
   function loop(time: number): void {
-    if (document.hidden) { lastFrame = time; requestAnimationFrame(loop); return; }
+    if (document.hidden || scrolling) { lastFrame = time; requestAnimationFrame(loop); return; }
     if (time - lastFrame >= 100) { lastFrame = time; render(time); }
     requestAnimationFrame(loop);
   }
