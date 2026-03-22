@@ -59,9 +59,10 @@ export function initDownloadButtons(): void {
         if (!res.ok) throw new Error(String(res.status));
         const data = await res.json();
         const asset = data.assets.find((a: { name: string }) => a.name.endsWith(".dmg"));
-        if (asset?.browser_download_url) {
-          dmgUrl = asset.browser_download_url;
-          location.href = dmgUrl!;
+        const url = asset?.browser_download_url;
+        if (typeof url === "string" && url.startsWith("https://github.com/")) {
+          dmgUrl = url;
+          location.href = url;
         } else {
           location.href = fallback;
         }
