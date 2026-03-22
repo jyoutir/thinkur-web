@@ -228,24 +228,8 @@ class PixelSpinner {
     }
   }
 
-  private cycleDuration(): number {
-    switch (this.state) {
-      case "listening": return 1.4;
-      case "processing": return 0.7;
-      case "success": return 1.8;
-      case "idle": return 4.0;
-      default: { const _: never = this.state; return assertNever(_); }
-    }
-  }
-
-  private updateIntervalFps(): number {
-    switch (this.state) {
-      case "listening": return 30;
-      case "processing": return 20;
-      case "idle": case "success": return 30;
-      default: { const _: never = this.state; return assertNever(_); }
-    }
-  }
+  private static readonly CYCLE_DURATION: Record<DemoPhase, number> = { idle: 4.0, listening: 1.4, processing: 0.7, success: 1.8 };
+  private static readonly FPS: Record<DemoPhase, number> = { idle: 30, listening: 30, processing: 20, success: 30 };
 
   setState(nextState: DemoPhase): void {
     if (this.state === nextState) return;
@@ -354,7 +338,7 @@ class PixelSpinner {
   private tick(now: number): void {
     if (!this.running) return;
     const elapsed = (now - this.epoch) / 1000;
-    const phase = ((elapsed / this.cycleDuration()) % 1 + 1) % 1;
+    const phase = ((elapsed / PixelSpinner.CYCLE_DURATION[this.state]) % 1 + 1) % 1;
     const [r, g, b] = this.colorForState();
 
     for (let i = 0; i < this.cells.length; i++) {
@@ -377,7 +361,7 @@ class PixelSpinner {
 
     this.frameTimer = setTimeout(() => {
       this.rafId = requestAnimationFrame(this.tick);
-    }, 1000 / this.updateIntervalFps());
+    }, 1000 / PixelSpinner.FPS[this.state]);
   }
 }
 
