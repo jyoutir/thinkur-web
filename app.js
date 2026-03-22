@@ -1433,6 +1433,26 @@ function initFeatureCards() {
   new FeatureCardStack(track, dots);
 }
 
+function initDemoVideo() {
+  const video = document.getElementById("demo-video");
+  const btn = document.getElementById("demo-play-btn");
+  if (!video || !btn) return;
+
+  const toggle = () => {
+    if (video.paused) {
+      video.play();
+      btn.classList.add("is-hidden");
+    } else {
+      video.pause();
+      btn.classList.remove("is-hidden");
+    }
+  };
+
+  btn.addEventListener("click", toggle);
+  video.addEventListener("click", toggle);
+  video.addEventListener("ended", () => btn.classList.remove("is-hidden"));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
@@ -1440,6 +1460,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSavingsCalculator();
   initDownloadButtons();
   initGitHubStars();
+  initDemoVideo();
   initCloudBackground();
   initScrollReveal();
 });
