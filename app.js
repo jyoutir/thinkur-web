@@ -1250,12 +1250,14 @@ function initScrollReveal() {
 class FeatureCardStack {
   constructor(trackEl, dotEls) {
     this.track = trackEl;
+    this.carousel = trackEl.closest(".feature-carousel");
     this.cards = Array.from(trackEl.querySelectorAll(".feature-card"));
     this.dots = Array.from(dotEls);
     this.activeIndex = 0;
     this.total = this.cards.length;
     this.autoTimer = null;
     this.isDragging = false;
+    this.isExpanded = false;
     this.dragStartX = 0;
     this.dragDeltaX = 0;
     this.velocity = 0;
@@ -1295,12 +1297,27 @@ class FeatureCardStack {
       dot.addEventListener("click", () => this.goTo(Number(dot.dataset.goto)));
     });
 
+    // Expand / close
+    const expandBtn = document.getElementById("feature-expand-btn");
+    const closeBtn = document.getElementById("feature-close-btn");
+    if (expandBtn) expandBtn.addEventListener("click", () => this.expand());
+    if (closeBtn) closeBtn.addEventListener("click", () => this.collapse());
+
     // Keyboard
     document.addEventListener("keydown", (e) => {
-      if (!this.isInView()) return;
+      if (e.key === "Escape" && this.isExpanded) { this.collapse(); return; }
+      if (!this.isInView() && !this.isExpanded) return;
       if (e.key === "ArrowRight") { e.preventDefault(); this.next(); }
       if (e.key === "ArrowLeft") { e.preventDefault(); this.prev(); }
     });
+
+    // Click backdrop to close expanded
+    if (this.carousel) {
+      this.carousel.addEventListener("click", (e) => {
+        if (!this.isExpanded) return;
+        if (e.target === this.carousel) this.collapse();
+      });
+    }
 
     // Desktop drag via pointer events
     this.track.addEventListener("pointerdown", (e) => this.onDragStart(e));
@@ -1322,6 +1339,25 @@ class FeatureCardStack {
     this.track.addEventListener("mouseleave", () => this.startAuto());
     this.track.addEventListener("focusin", () => this.pauseAuto());
     this.track.addEventListener("focusout", () => this.startAuto());
+  }
+
+  expand() {
+    if (!this.carousel) return;
+    this.isExpanded = true;
+    this.carousel.classList.add("is-expanded");
+    this.pauseAuto();
+    // Load all GIFs when expanding
+    this.cards.forEach((card) => {
+      const img = card.querySelector("img[data-src]");
+      if (img) { img.src = img.dataset.src; img.removeAttribute("data-src"); }
+    });
+  }
+
+  collapse() {
+    if (!this.carousel) return;
+    this.isExpanded = false;
+    this.carousel.classList.remove("is-expanded");
+    this.startAuto();
   }
 
   onDragStart(e) {
@@ -1383,13 +1419,27 @@ class FeatureCardStack {
   prev() { this.goTo(this.activeIndex - 1); }
 
   updatePositions() {
-    if (this.isMobile) return;
+    if (this.isMobile) {
+      this.loadActiveGif();
+      return;
+    }
     this.cards.forEach((card, i) => {
       const offset = ((i - this.activeIndex) % this.total + this.total) % this.total;
       card.dataset.position = String(offset);
       card.style.transform = "";
       card.style.transition = "";
     });
+    this.loadActiveGif();
+  }
+
+  loadActiveGif() {
+    const card = this.cards[this.activeIndex];
+    if (!card) return;
+    const img = card.querySelector("img[data-src]");
+    if (img) {
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+    }
   }
 
   updateDots() {
@@ -1408,10 +1458,11 @@ class FeatureCardStack {
     });
     this.activeIndex = closest;
     this.updateDots();
+    this.loadActiveGif();
   }
 
   startAuto() {
-    if (this.reducedMotion) return;
+    if (this.reducedMotion || this.isExpanded) return;
     this.pauseAuto();
     this.autoTimer = setInterval(() => this.next(), this.AUTO_INTERVAL);
   }
@@ -1430,7 +1481,17 @@ function initFeatureCards() {
   const track = document.querySelector("[data-feature-track]");
   const dots = document.querySelectorAll(".feature-dot");
   if (!track || !dots.length) return;
-  new FeatureCardStack(track, dots);
+
+  const section = document.querySelector(".section-features");
+  if (!section) { new FeatureCardStack(track, dots); return; }
+
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      new FeatureCardStack(track, dots);
+      observer.disconnect();
+    }
+  }, { threshold: 0.05 });
+  observer.observe(section);
 }
 
 function initDemoVideo() {
@@ -1453,6 +1514,50 @@ function initDemoVideo() {
   video.addEventListener("ended", () => btn.classList.remove("is-hidden"));
 }
 
+function initTabEasterEgg() {
+  const tab = document.querySelector("[data-easter-tab]");
+  if (!tab) return;
+  tab.style.cursor = "pointer";
+  let active = false;
+
+  const phrases = [
+    "Hey, you found the easter egg!",
+    "thinkur turns your voice into text like this.",
+    "No cloud. No subscription. Just your Mac.",
+    "4x faster than typing. Try it.",
+    "This is what dictation feels like.",
+  ];
+
+  tab.addEventListener("click", () => {
+    if (active) return;
+    active = true;
+    tab.style.transform = "scale(0.92)";
+    setTimeout(() => (tab.style.transform = ""), 120);
+
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+    const bubble = document.createElement("div");
+    bubble.className = "easter-bubble";
+    bubble.textContent = "";
+    tab.parentElement.appendChild(bubble);
+
+    requestAnimationFrame(() => bubble.classList.add("is-visible"));
+
+    let i = 0;
+    const type = () => {
+      if (i < phrase.length) {
+        bubble.textContent = phrase.slice(0, ++i);
+        setTimeout(type, 28 + Math.random() * 32);
+      } else {
+        setTimeout(() => {
+          bubble.classList.remove("is-visible");
+          setTimeout(() => { bubble.remove(); active = false; }, 300);
+        }, 2000);
+      }
+    };
+    type();
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
@@ -1463,4 +1568,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initDemoVideo();
   initCloudBackground();
   initScrollReveal();
+  initTabEasterEgg();
 });
