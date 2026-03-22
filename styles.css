@@ -446,9 +446,16 @@ h3,
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: var(--sp-4) 0;
+  margin: var(--sp-4) 0 0;
   font-size: 1rem;
   color: var(--muted);
+}
+
+.hero-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+  margin: 0 auto;
 }
 
 .hero-shortcut kbd {
@@ -506,18 +513,10 @@ h3,
   gap: 6px;
 }
 
-.replaces-half-label {
-  font-weight: 600;
-  font-size: 0.6rem;
-  color: var(--muted-2);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
 .replaces-mid {
   width: 1px;
   background: var(--line);
-  margin: 4px 0;
+  margin: 0;
   flex-shrink: 0;
 }
 
