@@ -1,3 +1,5 @@
 node_modules/
 dist/
 .DS_Store
+autosecure_results.tsv
+baseline_tests.log
