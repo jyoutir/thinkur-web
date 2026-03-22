@@ -10,7 +10,6 @@ interface DemoScenario {
   title: string;
   icon: string;
   latency: string;
-  raw: string;
   clean: string;
   renderBody: () => string;
 }
@@ -29,7 +28,7 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Terminal",
     icon: "./assets/icons/terminal.png",
     latency: "2.1ms",
-    raw: "um can you check the deploy status then restart the worker",
+
     clean: "Can you check the deploy status, then restart the worker?",
     renderBody: () => `
       <div class="preview-terminal">
@@ -42,7 +41,7 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Firefox",
     icon: "./assets/icons/firefox.png",
     latency: "2.4ms",
-    raw: "dear sarah comma thanks for the update period we can ship tuesday afternoon",
+
     clean: "Dear Sarah, thanks for the update. We can ship Tuesday afternoon.",
     renderBody: () => `
       <div class="preview-firefox">
@@ -69,7 +68,7 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Messages",
     icon: "./assets/icons/messages.png",
     latency: "1.9ms",
-    raw: "yeah um thursday works for me uh does two pm work for everyone",
+
     clean: "Thursday works for me. Does 2:00 PM work for everyone?",
     renderBody: () => `
       <div class="preview-messages">
@@ -92,7 +91,7 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Slack",
     icon: "./assets/icons/slack.png",
     latency: "2.2ms",
-    raw: "first check logs second restart api third post status in backend",
+
     clean: "1. Check logs\n2. Restart API\n3. Post status in #backend",
     renderBody: () => `
       <div class="preview-slack">
@@ -116,7 +115,7 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Notes",
     icon: "./assets/icons/notes.png",
     latency: "2.0ms",
-    raw: "meeting moved to two thirty pm on march third and send recap to everyone",
+
     clean: "Meeting moved to 2:30 PM on March 3. Send a recap to everyone.",
     renderBody: () => `
       <div class="preview-notes">
