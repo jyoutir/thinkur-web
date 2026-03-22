@@ -1,5 +1,5 @@
 const WORKING_DAYS_PER_MONTH = 21;
-const DEFAULT_HOURLY_RATE = 25;
+const DEFAULT_HOURLY_RATE = 30;
 const TYPING_WPM = 45;
 const PROJECTED_DICTATION_WPM = 110;
 
@@ -182,43 +182,27 @@ function initSavingsCalculator() {
   const hoursSlider = document.getElementById("typing-hours");
   const hoursLabel = document.getElementById("typing-hours-label");
   const hourlyRateInput = document.getElementById("hourly-rate");
-  const hourlyRateError = document.getElementById("hourly-rate-error");
-
   const monthlySavingsEl = document.getElementById("monthly-savings");
   const hoursSavedEl = document.getElementById("hours-saved");
   const wordsDayEl = document.getElementById("words-day");
 
-  if (
-    !hoursSlider ||
-    !hoursLabel ||
-    !hourlyRateInput ||
-    !hourlyRateError ||
-    !monthlySavingsEl ||
-    !hoursSavedEl ||
-    !wordsDayEl
-  ) {
-    return;
-  }
+  if (!hoursSlider || !monthlySavingsEl || !hoursSavedEl || !wordsDayEl) return;
 
   const update = () => {
     const hoursTypingPerDay = clampNumber(Number(hoursSlider.value) || 2, 0.5, 8);
-    const parsedRate = Number(hourlyRateInput.value);
-    const hasRateError = !Number.isFinite(parsedRate) || parsedRate <= 0;
-    const hourlyRate = clampNumber(hasRateError ? DEFAULT_HOURLY_RATE : parsedRate, 1, 100000);
-
+    const parsedRate = Number(hourlyRateInput?.value);
+    const hourlyRate = clampNumber(Number.isFinite(parsedRate) && parsedRate > 0 ? parsedRate : DEFAULT_HOURLY_RATE, 1, 100000);
     const { monthlySavings, monthlyHoursSaved, wordsPerDay } = computeSavings(hoursTypingPerDay, hourlyRate);
 
-    hoursLabel.textContent = `${hoursTypingPerDay.toFixed(1)}h / day`;
+    if (hoursLabel) hoursLabel.textContent = `${hoursTypingPerDay.toFixed(0)}h`;
     monthlySavingsEl.textContent = formatCurrency(monthlySavings);
-    hoursSavedEl.textContent = `${monthlyHoursSaved.toFixed(1)} hours`;
+    hoursSavedEl.textContent = `${Math.round(monthlyHoursSaved)} hours`;
     wordsDayEl.textContent = new Intl.NumberFormat("en-US").format(wordsPerDay);
-
-    hourlyRateError.hidden = !hasRateError;
   };
 
   hoursSlider.addEventListener("input", update);
-  hourlyRateInput.addEventListener("input", update);
-  update();
+  if (hourlyRateInput) hourlyRateInput.addEventListener("input", update);
+  update(); // Run immediately so page shows real numbers
 }
 
 function easeOutCubic(t) {
@@ -879,6 +863,19 @@ function initDownloadButtons() {
   });
 }
 
+async function initGitHubStars() {
+  const badge = document.querySelector("[data-github-stars]");
+  if (!badge) return;
+  try {
+    const res = await fetch("https://api.github.com/repos/jyoutir/thinkur");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.stargazers_count > 0) {
+      badge.textContent = `(${new Intl.NumberFormat("en-US").format(data.stargazers_count)})`;
+    }
+  } catch { /* silent fail */ }
+}
+
 // ── Simplex 2D noise (self-contained, no deps) ──────────────────────────────
 
 const SimplexNoise = (() => {
@@ -1238,12 +1235,202 @@ function initScrollReveal() {
   els.forEach((el) => observer.observe(el));
 }
 
+// ── Feature card stack ──────────────────────────────────
+
+class FeatureCardStack {
+  constructor(trackEl, dotEls) {
+    this.track = trackEl;
+    this.cards = Array.from(trackEl.querySelectorAll(".feature-card"));
+    this.dots = Array.from(dotEls);
+    this.activeIndex = 0;
+    this.total = this.cards.length;
+    this.autoTimer = null;
+    this.isDragging = false;
+    this.dragStartX = 0;
+    this.dragDeltaX = 0;
+    this.velocity = 0;
+    this.lastDragX = 0;
+    this.lastDragTime = 0;
+    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    this.DRAG_THRESHOLD = 50;
+    this.VELOCITY_THRESHOLD = 0.5;
+    this.AUTO_INTERVAL = 5000;
+
+    this.isMobile = window.innerWidth <= 960;
+    this._onResize = () => {
+      const was = this.isMobile;
+      this.isMobile = window.innerWidth <= 960;
+      if (was !== this.isMobile) this.updatePositions();
+    };
+    window.addEventListener("resize", this._onResize, { passive: true });
+
+    this.bindEvents();
+    this.updatePositions();
+    this.updateDots();
+    if (!this.reducedMotion) this.startAuto();
+  }
+
+  bindEvents() {
+    // Click any card to bring to front
+    this.cards.forEach((card, i) => {
+      card.addEventListener("click", () => {
+        if (this.isDragging) return;
+        if (i !== this.activeIndex) this.goTo(i);
+      });
+    });
+
+    // Dot nav
+    this.dots.forEach((dot) => {
+      dot.addEventListener("click", () => this.goTo(Number(dot.dataset.goto)));
+    });
+
+    // Keyboard
+    document.addEventListener("keydown", (e) => {
+      if (!this.isInView()) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); this.next(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); this.prev(); }
+    });
+
+    // Desktop drag via pointer events
+    this.track.addEventListener("pointerdown", (e) => this.onDragStart(e));
+    this.track.addEventListener("pointermove", (e) => this.onDragMove(e));
+    this.track.addEventListener("pointerup", (e) => this.onDragEnd(e));
+    this.track.addEventListener("pointercancel", (e) => this.onDragEnd(e));
+
+    // Mobile scroll sync
+    this.track.addEventListener("scrollend", () => this.syncFromScroll());
+    // Fallback for browsers without scrollend
+    let scrollTimer;
+    this.track.addEventListener("scroll", () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => this.syncFromScroll(), 120);
+    }, { passive: true });
+
+    // Pause auto on hover/focus
+    this.track.addEventListener("mouseenter", () => this.pauseAuto());
+    this.track.addEventListener("mouseleave", () => this.startAuto());
+    this.track.addEventListener("focusin", () => this.pauseAuto());
+    this.track.addEventListener("focusout", () => this.startAuto());
+  }
+
+  onDragStart(e) {
+    if (this.isMobile) return;
+    this.isDragging = true;
+    this.dragStartX = e.clientX;
+    this.lastDragX = e.clientX;
+    this.lastDragTime = performance.now();
+    this.velocity = 0;
+    this.pauseAuto();
+    this.track.setPointerCapture(e.pointerId);
+  }
+
+  onDragMove(e) {
+    if (!this.isDragging) return;
+    const now = performance.now();
+    const dt = now - this.lastDragTime;
+    this.dragDeltaX = e.clientX - this.dragStartX;
+    if (dt > 0) this.velocity = (e.clientX - this.lastDragX) / dt;
+    this.lastDragX = e.clientX;
+    this.lastDragTime = now;
+
+    const front = this.cards[this.activeIndex];
+    if (front) {
+      const d = this.dragDeltaX * 0.4;
+      front.style.transition = "none";
+      front.style.transform = `translateY(0) rotate(${d * 0.02}deg) scale(1) translateX(${d}px)`;
+    }
+  }
+
+  onDragEnd() {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+
+    const front = this.cards[this.activeIndex];
+    if (front) { front.style.transition = ""; front.style.transform = ""; }
+
+    const av = Math.abs(this.velocity);
+    const ad = Math.abs(this.dragDeltaX);
+    if (ad > this.DRAG_THRESHOLD || av > this.VELOCITY_THRESHOLD) {
+      if (this.dragDeltaX < 0 || this.velocity < -this.VELOCITY_THRESHOLD) this.next();
+      else this.prev();
+    } else {
+      this.updatePositions();
+    }
+    this.dragDeltaX = 0;
+    this.startAuto();
+  }
+
+  goTo(index) {
+    this.activeIndex = ((index % this.total) + this.total) % this.total;
+    this.updatePositions();
+    this.updateDots();
+    this.pauseAuto();
+    this.startAuto();
+  }
+
+  next() { this.goTo(this.activeIndex + 1); }
+  prev() { this.goTo(this.activeIndex - 1); }
+
+  updatePositions() {
+    if (this.isMobile) return;
+    this.cards.forEach((card, i) => {
+      const offset = ((i - this.activeIndex) % this.total + this.total) % this.total;
+      card.dataset.position = String(offset);
+      card.style.transform = "";
+      card.style.transition = "";
+    });
+  }
+
+  updateDots() {
+    this.dots.forEach((dot, i) => dot.classList.toggle("is-active", i === this.activeIndex));
+  }
+
+  syncFromScroll() {
+    if (!this.isMobile) return;
+    const rect = this.track.getBoundingClientRect();
+    const center = rect.left + rect.width / 2;
+    let closest = 0, closestDist = Infinity;
+    this.cards.forEach((card, i) => {
+      const cr = card.getBoundingClientRect();
+      const dist = Math.abs(cr.left + cr.width / 2 - center);
+      if (dist < closestDist) { closestDist = dist; closest = i; }
+    });
+    this.activeIndex = closest;
+    this.updateDots();
+  }
+
+  startAuto() {
+    if (this.reducedMotion) return;
+    this.pauseAuto();
+    this.autoTimer = setInterval(() => this.next(), this.AUTO_INTERVAL);
+  }
+
+  pauseAuto() {
+    if (this.autoTimer) { clearInterval(this.autoTimer); this.autoTimer = null; }
+  }
+
+  isInView() {
+    const r = this.track.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+}
+
+function initFeatureCards() {
+  const track = document.querySelector("[data-feature-track]");
+  const dots = document.querySelectorAll(".feature-dot");
+  if (!track || !dots.length) return;
+  new FeatureCardStack(track, dots);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
   initDemoContextSwitcher();
+  initFeatureCards();
   initSavingsCalculator();
   initDownloadButtons();
+  initGitHubStars();
   initCloudBackground();
   initScrollReveal();
 });

@@ -78,7 +78,6 @@
               <li><strong>4x faster than typing.</strong><span>Faster than Wispr Flow — zero cloud latency.</span></li>
               <li><strong>Smarter than Apple Dictation.</strong><span>Removes filler words, formats numbers, adapts to each app.</span></li>
               <li><strong>100% on-device.</strong><span>Your audio never leaves your Mac. Works offline.</span></li>
-              <li><strong>Free &amp; open-source.</strong><span>No license, no subscription. <a href="https://github.com/jyoutir/thinkur" target="_blank" rel="noreferrer">View the code</a>.</span></li>
             </ul>
 
             <div class="hero-actions">
@@ -117,129 +116,121 @@
         </div>
       </section>
 
-      <!-- ═══ NEVER PAY AGAIN ═══ -->
-      <section class="section section-value animate-in" id="download" aria-labelledby="value-title">
-        <div class="value-layout">
-          <div class="value-copy">
-            <p class="kicker">stop paying for voice tools</p>
-            <h2 id="value-title">Hundreds of pounds in value. Completely free.</h2>
-            <p class="lead">Others charge $10-30/month for what thinkur gives you for free. That's $120-360/year you keep in your pocket.</p>
+      <!-- ═══ FEATURE CARDS ═══ -->
+      <section class="section section-features animate-in" aria-labelledby="features-title">
+        <div class="section-head">
+          <p class="kicker">what thinkur does</p>
+          <h2 id="features-title">Four tools. One app. Zero compromise.</h2>
+        </div>
 
-            <div class="price-line">
-              <p class="price">Free, forever</p>
-              <p class="anchor"><span class="strike">$360/yr</span> what you'd pay for cloud alternatives</p>
-            </div>
-
-            <div class="close-cta">
-              <a class="button button-primary button-large" href="#" data-download>Download free</a>
-              <p class="micro">Free &amp; open-source. Requires macOS 15.0+ and Apple Silicon.</p>
-            </div>
-          </div>
-
-          <div class="savings-shell">
-            <aside class="savings-result" aria-live="polite">
-              <p class="result-label">Estimated value / month</p>
-              <p class="result-money" id="monthly-savings">$0</p>
-
-              <div class="result-divider" aria-hidden="true"></div>
-
-              <div class="result-metrics">
-                <div>
-                  <p class="metric-value" id="hours-saved">0 hours</p>
-                  <p class="metric-label">time saved</p>
-                </div>
-                <div>
-                  <p class="metric-value" id="words-day">0</p>
-                  <p class="metric-label">words per day</p>
-                </div>
+        <div class="feature-carousel" aria-label="Feature showcase">
+          <div class="feature-track" data-feature-track>
+            <article class="feature-card" data-card-index="0" style="--card-accent: #34c759;">
+              <div class="feature-card-media">
+                <img src="./assets/thinkur-demo-2.gif" alt="Voice dictation removing filler words in real-time" loading="lazy" />
               </div>
+              <div class="feature-card-body">
+                <span class="feature-card-number">01</span>
+                <h3 class="feature-card-title">Speak naturally, get clean text</h3>
+                <p class="feature-card-desc">4x faster than typing. Works in every app.</p>
+              </div>
+            </article>
 
-              <p class="result-note">Free &amp; open-source. Keep the upside forever.</p>
-            </aside>
+            <article class="feature-card" data-card-index="1" style="--card-accent: #5ac8fa;">
+              <div class="feature-card-media">
+                <img src="./assets/thinkur-demo-1.gif" alt="Meeting recording with speaker diarisation" loading="lazy" />
+              </div>
+              <div class="feature-card-body">
+                <span class="feature-card-number">02</span>
+                <h3 class="feature-card-title">Record calls with speaker labels</h3>
+                <p class="feature-card-desc">Speaker diarisation, searchable transcripts.</p>
+              </div>
+            </article>
 
-            <div class="savings-controls">
-              <article class="control-card">
-                <p class="control-title">Typing time per day</p>
-                <p id="typing-hours-label" class="control-value">2.0h / day</p>
-                <input id="typing-hours" class="slider" type="range" min="0.5" max="8" step="0.5" value="2" />
-              </article>
+            <article class="feature-card" data-card-index="2" style="--card-accent: #ff9f0a;">
+              <div class="feature-card-media">
+                <img src="./assets/thinkur-demo-3.gif" alt="thinkur insights dashboard and theme picker" loading="lazy" />
+              </div>
+              <div class="feature-card-body">
+                <span class="feature-card-number">03</span>
+                <h3 class="feature-card-title">Designed to feel native</h3>
+                <p class="feature-card-desc">Insights, themes, and attention to detail.</p>
+              </div>
+            </article>
 
-              <article class="control-card">
-                <p class="control-title">Your hourly value</p>
-                <label class="money-row" for="hourly-rate">
-                  <span class="money-prefix">$</span>
-                  <input id="hourly-rate" type="number" min="1" step="1" value="25" />
-                  <span class="money-suffix">/hour</span>
-                </label>
-                <p class="field-hint">Use your blended hourly value.</p>
-                <p class="field-error" id="hourly-rate-error" hidden>Enter a valid hourly value.</p>
-              </article>
+            <article class="feature-card" data-card-index="3" style="--card-accent: #b48eff;">
+              <div class="feature-card-media">
+                <img src="./assets/thinkur-demo-1.gif" alt="MCP integration feeding transcripts to AI tools" loading="lazy" />
+              </div>
+              <div class="feature-card-body">
+                <span class="feature-card-number">04</span>
+                <h3 class="feature-card-title">Feed transcripts to your AI tools</h3>
+                <p class="feature-card-desc">Claude, ChatGPT, Cursor — via MCP.</p>
+              </div>
+            </article>
+          </div>
 
-              <p class="assumption">Assumes 45 WPM typing, 110 WPM dictation, and 21 workdays per month.</p>
-            </div>
+          <div class="feature-nav" aria-label="Feature navigation">
+            <button class="feature-dot is-active" data-goto="0" aria-label="Voice Dictation"></button>
+            <button class="feature-dot" data-goto="1" aria-label="Meeting Recording"></button>
+            <button class="feature-dot" data-goto="2" aria-label="Beautiful UI"></button>
+            <button class="feature-dot" data-goto="3" aria-label="AI-Ready"></button>
           </div>
         </div>
       </section>
 
-      <!-- ═══ THREE PILLARS ═══ -->
-      <section class="section section-intelligence animate-in" aria-labelledby="pillars-title">
+      <!-- ═══ VALUE PROP ═══ -->
+      <section class="section section-value animate-in" id="download" aria-labelledby="value-title">
         <div class="section-head">
-          <p class="kicker">three tools, one app, zero cost</p>
-          <h2 id="pillars-title">Replace your paid voice tools. All of them.</h2>
+          <p class="kicker">stop paying for voice tools</p>
+          <h2 id="value-title">How much is your time worth?</h2>
         </div>
 
-        <div class="intel-layout">
-          <article class="compare-card stagger animate-in">
-            <div class="compare-head compare-grid">
-              <p>What you get</p>
-              <p>What others charge</p>
-              <p>thinkur</p>
+        <div class="calculator-layout">
+          <div class="calculator-result" aria-live="polite">
+            <p class="result-label">You'd save</p>
+            <p class="result-money" id="monthly-savings">$162</p>
+            <p class="result-sub">per month in productivity gains</p>
+            <div class="result-stats">
+              <div>
+                <strong id="hours-saved">13 hours</strong>
+                <span>saved / month</span>
+              </div>
+              <div>
+                <strong id="words-day">5,850</strong>
+                <span>words / day</span>
+              </div>
             </div>
+          </div>
 
-            <div class="compare-row compare-grid">
-              <p><strong>Voice dictation</strong><br><small>Speak naturally, get clean text in any app</small></p>
-              <p>Wispr Flow: $12/mo<br>Typeless: $12/mo<br>Superwhisper: $85/yr</p>
-              <p><strong>Free</strong></p>
+          <div class="calculator-controls">
+            <div class="calc-field">
+              <label for="typing-hours">How much do you type per day?</label>
+              <div class="calc-slider-row">
+                <input id="typing-hours" class="slider" type="range" min="0.5" max="8" step="0.5" value="2" />
+                <output id="typing-hours-label">2h</output>
+              </div>
             </div>
-            <div class="compare-row compare-grid">
-              <p><strong>Meeting recording</strong><br><small>Record calls with speaker diarisation</small></p>
-              <p>Fireflies: $10/mo<br>Otter.ai: $8/mo</p>
-              <p><strong>Free</strong></p>
+            <div class="calc-field">
+              <label for="hourly-rate">Your hourly value</label>
+              <div class="calc-input-row">
+                <span>$</span>
+                <input id="hourly-rate" type="number" min="1" step="1" value="30" />
+                <span>/hr</span>
+              </div>
             </div>
-            <div class="compare-row compare-grid">
-              <p><strong>Local AI-ready transcripts</strong><br><small>Your data stays on-device for Claude, ChatGPT, Cursor</small></p>
-              <p>Cloud tools send your data to their servers</p>
-              <p><strong>Free &amp; private</strong></p>
-            </div>
-            <div class="compare-row compare-grid">
-              <p><strong>Privacy</strong></p>
-              <p>Audio sent to vendor servers</p>
-              <p><strong>100% on your Mac</strong></p>
-            </div>
-            <div class="compare-row compare-grid">
-              <p><strong>Internet required?</strong></p>
-              <p>Yes — all features need cloud</p>
-              <p><strong>Works offline</strong></p>
-            </div>
-            <div class="compare-row compare-grid">
-              <p><strong>Total annual cost</strong></p>
-              <p><strong>$240-480/yr</strong></p>
-              <p><strong>$0</strong></p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- ═══ APP DEMO GIF ═══ -->
-      <section class="section section-apps animate-in" aria-labelledby="demo-title">
-        <div class="section-head">
-          <p class="kicker">beautifully crafted</p>
-          <h2 id="demo-title">Designed to feel native. Because it is.</h2>
+            <p class="calc-context">
+              <span class="strikethrough">Wispr Flow $12/mo</span> &middot;
+              <span class="strikethrough">Otter $8/mo</span> &middot;
+              <span class="strikethrough">Fireflies $10/mo</span> &middot;
+              thinkur: <strong>$0</strong>
+            </p>
+          </div>
         </div>
 
-        <div class="demo-gallery">
-          <img src="./assets/thinkur-demo-3.gif" alt="thinkur colour themes and UI" />
-          <img src="./assets/thinkur-demo-2.gif" alt="thinkur dictating in Apple Notes" />
+        <div class="section-cta">
+          <a class="button button-primary button-large" href="#" data-download>Download free</a>
+          <p class="micro">Free &amp; open-source. macOS 15.0+ / Apple Silicon.</p>
         </div>
       </section>
 
@@ -303,8 +294,8 @@
             <p class="kicker">open source</p>
             <h2 id="oss-title">Built in the open. Free forever.</h2>
             <p class="lead">thinkur is fully open-source under the MIT license. No accounts, no tracking, no word limits. Read the code, contribute features, or fork it and build your own.</p>
-            <div class="hero-actions">
-              <a class="button button-primary button-large" href="https://github.com/jyoutir/thinkur" target="_blank" rel="noreferrer">&#9733; Star on GitHub</a>
+            <div class="oss-actions">
+              <a class="button button-primary button-large" href="https://github.com/jyoutir/thinkur" target="_blank" rel="noreferrer">&#9733; Star on GitHub <span class="github-stars" data-github-stars></span></a>
               <a class="button button-ghost button-large" href="https://github.com/jyoutir/thinkur/issues" target="_blank" rel="noreferrer">Report an issue</a>
             </div>
           </div>
