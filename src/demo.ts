@@ -142,78 +142,26 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
 
 // ── Rendering ─────────────────────────────────────────
 
-// renderWindowShell builds a static, developer-authored demo UI frame.
-// All values (title, icon) come from the DEMO_SCENARIOS constant above, not user input.
+// All values are developer-authored constants from DEMO_SCENARIOS, not user input.
 function renderWindowShell(scenario: DemoScenario): string {
-  const el = document.createElement("div");
-
-  const article = document.createElement("article");
-  article.className = "window-frame";
-  article.setAttribute("data-phase", "idle");
-  article.setAttribute("aria-label", `${scenario.title} preview`);
-
-  const bar = document.createElement("div");
-  bar.className = "window-bar";
-
-  const left = document.createElement("div");
-  left.className = "window-left";
-
-  const controls = document.createElement("div");
-  controls.className = "window-controls";
-  controls.setAttribute("aria-hidden", "true");
-  for (let i = 0; i < 3; i++) {
-    const dot = document.createElement("span");
-    dot.className = "window-dot";
-    controls.appendChild(dot);
-  }
-
-  const app = document.createElement("div");
-  app.className = "window-app";
-  const img = document.createElement("img");
-  img.src = scenario.icon;
-  img.alt = "";
-  img.width = 16;
-  img.height = 16;
-  const title = document.createElement("p");
-  title.className = "window-title";
-  title.textContent = scenario.title;
-  app.appendChild(img);
-  app.appendChild(title);
-
-  left.appendChild(controls);
-  left.appendChild(app);
-
-  const status = document.createElement("div");
-  status.className = "window-status";
-
-  const spinner = document.createElement("span");
-  spinner.className = "pixel-spinner";
-  spinner.setAttribute("data-spinner", "");
-  spinner.setAttribute("data-cols", "4");
-  spinner.setAttribute("data-rows", "2");
-  spinner.setAttribute("aria-hidden", "true");
-
-  const phase = document.createElement("span");
-  phase.className = "window-phase";
-  phase.setAttribute("data-role", "phase-label");
-  phase.textContent = "Ready";
-
-  status.appendChild(spinner);
-  status.appendChild(phase);
-
-  bar.appendChild(left);
-  bar.appendChild(status);
-
-  const body = document.createElement("div");
-  body.className = "preview-body";
-  // Preview body HTML is a static developer-authored template from DEMO_SCENARIOS
-  body.innerHTML = scenario.renderBody(); // eslint-disable-line no-unsanitized/property
-
-  article.appendChild(bar);
-  article.appendChild(body);
-  el.appendChild(article);
-
-  return el.innerHTML;
+  return `<article class="window-frame" data-phase="idle" aria-label="${scenario.title} preview">
+    <div class="window-bar">
+      <div class="window-left">
+        <div class="window-controls" aria-hidden="true">
+          <span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span>
+        </div>
+        <div class="window-app">
+          <img src="${scenario.icon}" alt="" width="16" height="16">
+          <p class="window-title">${scenario.title}</p>
+        </div>
+      </div>
+      <div class="window-status">
+        <span class="pixel-spinner" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
+        <span class="window-phase" data-role="phase-label">Ready</span>
+      </div>
+    </div>
+    <div class="preview-body">${scenario.renderBody()}</div>
+  </article>`;
 }
 
 // ── Easing ────────────────────────────────────────────
