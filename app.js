@@ -1,17 +1,11 @@
 const WORKING_DAYS_PER_MONTH = 21;
 const DEFAULT_HOURLY_RATE = 30;
+
+// Stub — demo removed but cloud canvas still references this
+const demoGlow = { phase: "idle", changedAt: 0 };
 const TYPING_WPM = 45;
 const PROJECTED_DICTATION_WPM = 110;
 
-const DEMO_PHASE = {
-  IDLE: "idle",
-  LISTENING: "listening",
-  PROCESSING: "processing",
-  SUCCESS: "success"
-};
-
-// shared state — demo playback writes, cloud canvas reads
-const demoGlow = { phase: "idle", changedAt: 0 };
 
 const DEMO_SCENARIOS = {
   terminal: {
@@ -864,14 +858,30 @@ function initDownloadButtons() {
 }
 
 async function initGitHubStars() {
-  const badge = document.querySelector("[data-github-stars]");
-  if (!badge) return;
+  const badges = document.querySelectorAll("[data-github-stars]");
+  if (!badges.length) return;
+
+  const CACHE_KEY = "thinkur_stars";
+  const CACHE_TTL = 3600000; // 1 hour
+
+  const setAll = (text) => badges.forEach((b) => { b.textContent = text; });
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+    if (cached.count && Date.now() - cached.ts < CACHE_TTL) {
+      setAll(`(${new Intl.NumberFormat("en-US").format(cached.count)})`);
+      return;
+    }
+  } catch { /* ignore corrupt cache */ }
+
   try {
     const res = await fetch("https://api.github.com/repos/jyoutir/thinkur");
     if (!res.ok) return;
     const data = await res.json();
     if (data.stargazers_count > 0) {
-      badge.textContent = `(${new Intl.NumberFormat("en-US").format(data.stargazers_count)})`;
+      const formatted = `(${new Intl.NumberFormat("en-US").format(data.stargazers_count)})`;
+      setAll(formatted);
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ count: data.stargazers_count, ts: Date.now() }));
     }
   } catch { /* silent fail */ }
 }
@@ -1426,7 +1436,6 @@ function initFeatureCards() {
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initAppMarquee();
-  initDemoContextSwitcher();
   initFeatureCards();
   initSavingsCalculator();
   initDownloadButtons();
