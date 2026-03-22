@@ -285,14 +285,9 @@ class PixelSpinner {
     return 0;
   }
 
-  private colorForState(): [number, number, number] {
-    switch (this.state) {
-      case "listening": case "success": return [52, 199, 89];
-      case "processing": return [244, 244, 246];
-      case "idle": return [180, 182, 191];
-      default: { const _: never = this.state; return assertNever(_); }
-    }
-  }
+  private static readonly STATE_COLOR: Record<DemoPhase, [number, number, number]> = {
+    idle: [180, 182, 191], listening: [52, 199, 89], processing: [244, 244, 246], success: [52, 199, 89],
+  };
 
   private glowForState(index: number): number {
     switch (this.state) {
@@ -339,7 +334,7 @@ class PixelSpinner {
     if (!this.running) return;
     const elapsed = (now - this.epoch) / 1000;
     const phase = ((elapsed / PixelSpinner.CYCLE_DURATION[this.state]) % 1 + 1) % 1;
-    const [r, g, b] = this.colorForState();
+    const [r, g, b] = PixelSpinner.STATE_COLOR[this.state];
 
     for (let i = 0; i < this.cells.length; i++) {
       const row = Math.floor(i / this.cols);
