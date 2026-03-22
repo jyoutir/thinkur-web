@@ -134,9 +134,7 @@ export function initCloudBackground(): void {
   function fbm(x: number, y: number): number {
     return noise(x, y) * 0.5
       + noise(x * 2, y * 2) * 0.25
-      + noise(x * 4, y * 4) * 0.125
-      + noise(x * 8, y * 8) * 0.0625
-      + noise(x * 16, y * 16) * 0.03125;
+      + noise(x * 4, y * 4) * 0.125;
   }
 
   let demoEl: HTMLElement | null = null;
@@ -165,7 +163,7 @@ export function initCloudBackground(): void {
 
   function render(time: number): void {
     if (document.hidden) return;
-    if (time - fieldTime >= 80) updateField(time);
+    if (time - fieldTime >= 200) updateField(time);
 
     const root = document.documentElement;
     const isLight = root.getAttribute("data-theme") === "light";
@@ -272,6 +270,7 @@ export function initCloudBackground(): void {
   }
 
   function loop(time: number): void {
+    if (document.hidden) { lastFrame = time; requestAnimationFrame(loop); return; }
     if (time - lastFrame >= 40) { lastFrame = time; render(time); }
     requestAnimationFrame(loop);
   }
