@@ -4,7 +4,7 @@ const WORKING_DAYS_PER_MONTH = 21;
 const TYPING_WPM = 45;
 const PROJECTED_DICTATION_WPM = 110;
 
-function computeSavings(hoursTypingPerDay: number, hourlyRate: number) {
+export function computeSavings(hoursTypingPerDay: number, hourlyRate: number) {
   const wordsPerDay = Math.round(hoursTypingPerDay * 60 * TYPING_WPM);
   const projectedDictationHours = (wordsPerDay / PROJECTED_DICTATION_WPM) / 60;
   const dailyHoursSaved = Math.max(0, hoursTypingPerDay - projectedDictationHours);
@@ -59,9 +59,10 @@ export function initDownloadButtons(): void {
         if (!res.ok) throw new Error(String(res.status));
         const data = await res.json();
         const asset = data.assets.find((a: { name: string }) => a.name.endsWith(".dmg"));
-        if (asset?.browser_download_url) {
-          dmgUrl = asset.browser_download_url;
-          location.href = dmgUrl!;
+        const url = asset?.browser_download_url;
+        if (typeof url === "string" && url.startsWith("https://github.com/")) {
+          dmgUrl = url;
+          location.href = url;
         } else {
           location.href = fallback;
         }
@@ -98,6 +99,42 @@ export async function initGitHubStars(): Promise<void> {
     if (data.stargazers_count > 0) {
       setAll(`(${fmt.format(data.stargazers_count)})`);
       localStorage.setItem(CACHE_KEY, JSON.stringify({ count: data.stargazers_count, ts: Date.now() }));
+    }
+  } catch {}
+}
+
+// ── GitHub downloads ─────────────────────────────────
+
+export async function initGitHubDownloads(): Promise<void> {
+  const badges = document.querySelectorAll("[data-github-downloads]");
+  if (!badges.length) return;
+
+  const CACHE_KEY = "thinkur_downloads";
+  const CACHE_TTL = 3600000;
+  const fmt = new Intl.NumberFormat("en-US");
+  const setAll = (text: string) => badges.forEach((b) => { b.textContent = text; });
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+    if (cached.count != null && Date.now() - cached.ts < CACHE_TTL) {
+      setAll(`${fmt.format(cached.count)}+ downloads`);
+      return;
+    }
+  } catch {}
+
+  try {
+    const res = await fetch("https://api.github.com/repos/jyoutir/thinkur-web/releases");
+    if (!res.ok) return;
+    const releases = await res.json();
+    let total = 0;
+    for (const release of releases) {
+      for (const asset of release.assets || []) {
+        total += asset.download_count || 0;
+      }
+    }
+    if (total > 0) {
+      setAll(`${fmt.format(total)}+ downloads`);
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ count: total, ts: Date.now() }));
     }
   } catch {}
 }

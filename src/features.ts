@@ -8,13 +8,8 @@ class FeatureCardStack {
   private activeIndex = 0;
   private total: number;
   private autoTimer: ReturnType<typeof setInterval> | null = null;
-  private isDragging = false;
   private isExpanded = false;
-  private dragStartX = 0;
-  private dragDeltaX = 0;
-  private velocity = 0;
-  private lastDragX = 0;
-  private lastDragTime = 0;
+  private drag: { startX: number; deltaX: number; velocity: number; lastX: number; lastTime: number } | null = null;
   private isMobile: boolean;
   private reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -45,7 +40,7 @@ class FeatureCardStack {
   private bindEvents(): void {
     this.cards.forEach((card, i) => {
       card.addEventListener("click", () => {
-        if (!this.isDragging && i !== this.activeIndex) this.goTo(i);
+        if (!this.drag && i !== this.activeIndex) this.goTo(i);
       });
     });
 
@@ -111,46 +106,42 @@ class FeatureCardStack {
 
   private onDragStart(e: PointerEvent): void {
     if (this.isMobile) return;
-    this.isDragging = true;
-    this.dragStartX = e.clientX;
-    this.lastDragX = e.clientX;
-    this.lastDragTime = performance.now();
-    this.velocity = 0;
+    this.drag = { startX: e.clientX, deltaX: 0, velocity: 0, lastX: e.clientX, lastTime: performance.now() };
     this.pauseAuto();
     this.track.setPointerCapture(e.pointerId);
   }
 
   private onDragMove(e: PointerEvent): void {
-    if (!this.isDragging) return;
+    if (!this.drag) return;
     const now = performance.now();
-    const dt = now - this.lastDragTime;
-    this.dragDeltaX = e.clientX - this.dragStartX;
-    if (dt > 0) this.velocity = (e.clientX - this.lastDragX) / dt;
-    this.lastDragX = e.clientX;
-    this.lastDragTime = now;
+    const dt = now - this.drag.lastTime;
+    this.drag.deltaX = e.clientX - this.drag.startX;
+    if (dt > 0) this.drag.velocity = (e.clientX - this.drag.lastX) / dt;
+    this.drag.lastX = e.clientX;
+    this.drag.lastTime = now;
 
     const front = this.cards[this.activeIndex];
     if (front) {
-      const d = this.dragDeltaX * 0.4;
+      const d = this.drag.deltaX * 0.4;
       front.style.transition = "none";
       front.style.transform = `translateY(0) rotate(${d * 0.02}deg) scale(1) translateX(${d}px)`;
     }
   }
 
   private onDragEnd(): void {
-    if (!this.isDragging) return;
-    this.isDragging = false;
+    if (!this.drag) return;
+    const { deltaX, velocity } = this.drag;
+    this.drag = null;
 
     const front = this.cards[this.activeIndex];
     if (front) { front.style.transition = ""; front.style.transform = ""; }
 
-    if (Math.abs(this.dragDeltaX) > this.DRAG_THRESHOLD || Math.abs(this.velocity) > this.VELOCITY_THRESHOLD) {
-      if (this.dragDeltaX < 0 || this.velocity < -this.VELOCITY_THRESHOLD) this.next();
+    if (Math.abs(deltaX) > this.DRAG_THRESHOLD || Math.abs(velocity) > this.VELOCITY_THRESHOLD) {
+      if (deltaX < 0 || velocity < -this.VELOCITY_THRESHOLD) this.next();
       else this.prev();
     } else {
       this.updatePositions();
     }
-    this.dragDeltaX = 0;
     this.startAuto();
   }
 
@@ -203,7 +194,7 @@ class FeatureCardStack {
   }
 
   private startAuto(): void {
-    if (this.reducedMotion) return;
+    if (this.reducedMotion || this.isExpanded) return;
     this.pauseAuto();
     this.autoTimer = setInterval(() => this.next(), this.AUTO_INTERVAL);
   }

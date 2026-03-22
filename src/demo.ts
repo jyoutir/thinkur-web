@@ -10,7 +10,6 @@ interface DemoScenario {
   title: string;
   icon: string;
   latency: string;
-  raw: string;
   clean: string;
   renderBody: () => string;
 }
@@ -29,7 +28,6 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Terminal",
     icon: "./assets/icons/terminal.png",
     latency: "2.1ms",
-    raw: "um can you check the deploy status then restart the worker",
     clean: "Can you check the deploy status, then restart the worker?",
     renderBody: () => `
       <div class="preview-terminal">
@@ -42,7 +40,6 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Firefox",
     icon: "./assets/icons/firefox.png",
     latency: "2.4ms",
-    raw: "dear sarah comma thanks for the update period we can ship tuesday afternoon",
     clean: "Dear Sarah, thanks for the update. We can ship Tuesday afternoon.",
     renderBody: () => `
       <div class="preview-firefox">
@@ -69,7 +66,6 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Messages",
     icon: "./assets/icons/messages.png",
     latency: "1.9ms",
-    raw: "yeah um thursday works for me uh does two pm work for everyone",
     clean: "Thursday works for me. Does 2:00 PM work for everyone?",
     renderBody: () => `
       <div class="preview-messages">
@@ -92,7 +88,6 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Slack",
     icon: "./assets/icons/slack.png",
     latency: "2.2ms",
-    raw: "first check logs second restart api third post status in backend",
     clean: "1. Check logs\n2. Restart API\n3. Post status in #backend",
     renderBody: () => `
       <div class="preview-slack">
@@ -116,7 +111,6 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
     title: "Notes",
     icon: "./assets/icons/notes.png",
     latency: "2.0ms",
-    raw: "meeting moved to two thirty pm on march third and send recap to everyone",
     clean: "Meeting moved to 2:30 PM on March 3. Send a recap to everyone.",
     renderBody: () => `
       <div class="preview-notes">
@@ -142,78 +136,26 @@ const DEMO_SCENARIOS: Record<DemoScenarioKey, DemoScenario> = {
 
 // ── Rendering ─────────────────────────────────────────
 
-// renderWindowShell builds a static, developer-authored demo UI frame.
-// All values (title, icon) come from the DEMO_SCENARIOS constant above, not user input.
+// All values are developer-authored constants from DEMO_SCENARIOS, not user input.
 function renderWindowShell(scenario: DemoScenario): string {
-  const el = document.createElement("div");
-
-  const article = document.createElement("article");
-  article.className = "window-frame";
-  article.setAttribute("data-phase", "idle");
-  article.setAttribute("aria-label", `${scenario.title} preview`);
-
-  const bar = document.createElement("div");
-  bar.className = "window-bar";
-
-  const left = document.createElement("div");
-  left.className = "window-left";
-
-  const controls = document.createElement("div");
-  controls.className = "window-controls";
-  controls.setAttribute("aria-hidden", "true");
-  for (let i = 0; i < 3; i++) {
-    const dot = document.createElement("span");
-    dot.className = "window-dot";
-    controls.appendChild(dot);
-  }
-
-  const app = document.createElement("div");
-  app.className = "window-app";
-  const img = document.createElement("img");
-  img.src = scenario.icon;
-  img.alt = "";
-  img.width = 16;
-  img.height = 16;
-  const title = document.createElement("p");
-  title.className = "window-title";
-  title.textContent = scenario.title;
-  app.appendChild(img);
-  app.appendChild(title);
-
-  left.appendChild(controls);
-  left.appendChild(app);
-
-  const status = document.createElement("div");
-  status.className = "window-status";
-
-  const spinner = document.createElement("span");
-  spinner.className = "pixel-spinner";
-  spinner.setAttribute("data-spinner", "");
-  spinner.setAttribute("data-cols", "4");
-  spinner.setAttribute("data-rows", "2");
-  spinner.setAttribute("aria-hidden", "true");
-
-  const phase = document.createElement("span");
-  phase.className = "window-phase";
-  phase.setAttribute("data-role", "phase-label");
-  phase.textContent = "Ready";
-
-  status.appendChild(spinner);
-  status.appendChild(phase);
-
-  bar.appendChild(left);
-  bar.appendChild(status);
-
-  const body = document.createElement("div");
-  body.className = "preview-body";
-  // Preview body HTML is a static developer-authored template from DEMO_SCENARIOS
-  body.innerHTML = scenario.renderBody(); // eslint-disable-line no-unsanitized/property
-
-  article.appendChild(bar);
-  article.appendChild(body);
-  el.appendChild(article);
-
-  return el.innerHTML;
+  return `<article class="window-frame" data-phase="idle" aria-label="${scenario.title} preview">
+    <div class="window-bar">
+      <div class="window-left">
+        <div class="window-controls" aria-hidden="true">
+          <span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span>
+        </div>
+        <div class="window-app">
+          <img src="${scenario.icon}" alt="" width="16" height="16">
+          <p class="window-title">${scenario.title}</p>
+        </div>
+      </div>
+      <div class="window-status">
+        <span class="pixel-spinner" data-spinner data-cols="4" data-rows="2" aria-hidden="true"></span>
+        <span class="window-phase" data-role="phase-label">Ready</span>
+      </div>
+    </div>
+    <div class="preview-body">${scenario.renderBody()}</div>
+  </article>`;
 }
 
 // ── Easing ────────────────────────────────────────────
@@ -286,24 +228,8 @@ class PixelSpinner {
     }
   }
 
-  private cycleDuration(): number {
-    switch (this.state) {
-      case "listening": return 1.4;
-      case "processing": return 0.7;
-      case "success": return 1.8;
-      case "idle": return 4.0;
-      default: { const _: never = this.state; return assertNever(_); }
-    }
-  }
-
-  private updateIntervalFps(): number {
-    switch (this.state) {
-      case "listening": return 30;
-      case "processing": return 20;
-      case "idle": case "success": return 30;
-      default: { const _: never = this.state; return assertNever(_); }
-    }
-  }
+  private static readonly CYCLE_DURATION: Record<DemoPhase, number> = { idle: 4.0, listening: 1.4, processing: 0.7, success: 1.8 };
+  private static readonly FPS: Record<DemoPhase, number> = { idle: 30, listening: 30, processing: 20, success: 30 };
 
   setState(nextState: DemoPhase): void {
     if (this.state === nextState) return;
@@ -359,14 +285,9 @@ class PixelSpinner {
     return 0;
   }
 
-  private colorForState(): [number, number, number] {
-    switch (this.state) {
-      case "listening": case "success": return [52, 199, 89];
-      case "processing": return [244, 244, 246];
-      case "idle": return [180, 182, 191];
-      default: { const _: never = this.state; return assertNever(_); }
-    }
-  }
+  private static readonly STATE_COLOR: Record<DemoPhase, [number, number, number]> = {
+    idle: [180, 182, 191], listening: [52, 199, 89], processing: [244, 244, 246], success: [52, 199, 89],
+  };
 
   private glowForState(index: number): number {
     switch (this.state) {
@@ -412,8 +333,8 @@ class PixelSpinner {
   private tick(now: number): void {
     if (!this.running) return;
     const elapsed = (now - this.epoch) / 1000;
-    const phase = ((elapsed / this.cycleDuration()) % 1 + 1) % 1;
-    const [r, g, b] = this.colorForState();
+    const phase = ((elapsed / PixelSpinner.CYCLE_DURATION[this.state]) % 1 + 1) % 1;
+    const [r, g, b] = PixelSpinner.STATE_COLOR[this.state];
 
     for (let i = 0; i < this.cells.length; i++) {
       const row = Math.floor(i / this.cols);
@@ -435,7 +356,7 @@ class PixelSpinner {
 
     this.frameTimer = setTimeout(() => {
       this.rafId = requestAnimationFrame(this.tick);
-    }, 1000 / this.updateIntervalFps());
+    }, 1000 / PixelSpinner.FPS[this.state]);
   }
 }
 
@@ -532,14 +453,10 @@ class DemoPlayback {
   }
 
   private waitFor(ms: number, token: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      const waiter = { timer: 0 as unknown as ReturnType<typeof setTimeout>, resolve: (_: boolean) => {} };
-      waiter.resolve = (ok: boolean) => {
-        this.pendingWaits.delete(waiter);
-        resolve(ok);
-      };
-      waiter.timer = setTimeout(() => waiter.resolve(token === this.token), ms);
-      this.pendingWaits.add(waiter);
+    return new Promise<boolean>((resolve) => {
+      const done = (ok: boolean) => { this.pendingWaits.delete(w); resolve(ok); };
+      const w = { timer: setTimeout(() => done(token === this.token), ms), resolve: done };
+      this.pendingWaits.add(w);
     });
   }
 

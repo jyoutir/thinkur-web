@@ -169,8 +169,7 @@ export function initCloudBackground(): void {
 
     const root = document.documentElement;
     const isLight = root.getAttribute("data-theme") === "light";
-    const onR = isLight ? 20 : 255, onG = isLight ? 20 : 255, onB = isLight ? 35 : 255;
-    const onPacked = pack(onR, onG, onB, 255);
+    const onPacked = isLight ? pack(20, 20, 35, 255) : pack(255, 255, 255, 255);
 
     if (mouseX >= 0) {
       if (smoothMouseX < 0) { smoothMouseX = mouseX; smoothMouseY = mouseY; }
@@ -187,8 +186,6 @@ export function initCloudBackground(): void {
     const hoverActive = smoothMouseX >= 0;
     const hoverSat = isLight ? 0.85 : 0.95;
     const hoverLit = isLight ? 0.45 : 0.58;
-    const timeHue = hueAccum;
-
     let demoCX = -1, demoCY = -1, demoElapsed = 0;
     const demoPhase = demoGlow.phase;
     const demoActive = demoPhase !== "idle";
@@ -236,7 +233,7 @@ export function initCloudBackground(): void {
             const dist = Math.sqrt(distSq);
             const glow = Math.min((1 - dist / HOVER_OUTER) ** 2 * 1.4, 0.92);
             if (glow > threshold) {
-              const hue = ((Math.atan2(dy, dx) / (Math.PI * 2) + 0.5) + timeHue) % 1;
+              const hue = ((Math.atan2(dy, dx) / (Math.PI * 2) + 0.5) + hueAccum) % 1;
               hslCalc(hue, hoverSat, hoverLit);
               buf32[pi] = pack(hR, hG, hB, 255);
               continue;

@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import { resolve } from "path";
 
@@ -10,5 +11,9 @@ export default defineConfig({
         blog: resolve(__dirname, "blog.html"),
       },
     },
+  },
+  test: {
+    environment: "jsdom",
+    include: ["src/**/*.test.ts"],
   },
 });
