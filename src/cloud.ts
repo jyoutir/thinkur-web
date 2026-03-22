@@ -111,14 +111,6 @@ export function initCloudBackground(): void {
 
   document.addEventListener("touchend", () => { mouseX = -1; mouseY = -1; }, { passive: true });
 
-  let scrolling = false;
-  let scrollTimer: ReturnType<typeof setTimeout>;
-  window.addEventListener("scroll", () => {
-    scrolling = true;
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => { scrolling = false; }, 150);
-  }, { passive: true });
-
   let hR = 0, hG = 0, hB = 0;
   function hslCalc(h: number, s: number, l: number): void {
     const a = s * Math.min(l, 1 - l);
@@ -142,7 +134,9 @@ export function initCloudBackground(): void {
   function fbm(x: number, y: number): number {
     return noise(x, y) * 0.5
       + noise(x * 2, y * 2) * 0.25
-      + noise(x * 4, y * 4) * 0.125;
+      + noise(x * 4, y * 4) * 0.125
+      + noise(x * 8, y * 8) * 0.0625
+      + noise(x * 16, y * 16) * 0.03125;
   }
 
   let demoEl: HTMLElement | null = null;
@@ -171,7 +165,7 @@ export function initCloudBackground(): void {
 
   function render(time: number): void {
     if (document.hidden) return;
-    if (time - fieldTime >= 200) updateField(time);
+    if (time - fieldTime >= 80) updateField(time);
 
     const root = document.documentElement;
     const isLight = root.getAttribute("data-theme") === "light";
@@ -278,8 +272,7 @@ export function initCloudBackground(): void {
   }
 
   function loop(time: number): void {
-    if (document.hidden || scrolling) { lastFrame = time; requestAnimationFrame(loop); return; }
-    if (time - lastFrame >= 100) { lastFrame = time; render(time); }
+    if (time - lastFrame >= 40) { lastFrame = time; render(time); }
     requestAnimationFrame(loop);
   }
 

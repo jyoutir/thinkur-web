@@ -357,25 +357,19 @@
   display: grid;
   gap: var(--sp-2);
   grid-template-columns: 1fr 1fr;
-  max-width: 860px;
+  max-width: 780px;
   margin: var(--sp-4) auto 0;
 }
 
 .testimonial-card {
-  background: linear-gradient(165deg, #ffffff, #f6f6f9);
-  border: 1px solid #e0e0e6;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  padding: var(--sp-3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin: 0;
-  transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
-}
-
-.testimonial-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
 }
 
 .testimonial-featured {
@@ -383,7 +377,7 @@
 }
 
 .testimonial-text {
-  color: #2a2a30;
+  color: var(--ink);
   font-size: 0.95rem;
   line-height: 1.55;
   margin: 0;
@@ -397,17 +391,12 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #ebebf0;
+  margin-top: 14px;
 }
 
 .testimonial-name {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #121214;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .testimonial-name a,
@@ -423,82 +412,41 @@
 }
 
 .testimonial-role {
-  color: #7a7a85;
-  font-size: 0.85rem;
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 /* ── Use case tags ───────────────────────────────────── */
 
 .use-cases {
-  margin-top: var(--sp-5);
+  margin-top: var(--sp-4);
   text-align: center;
 }
 
-.use-cases-title {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0 0 var(--sp-3);
+.use-cases-label {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  margin-bottom: var(--sp-2);
+  text-transform: uppercase;
 }
 
-.use-case-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-2);
-  max-width: 900px;
-  margin: 0 auto;
+.use-case-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
 }
 
-.use-case-card {
-  background: #ffffff;
-  border: 1px solid #e8e8ed;
-  border-radius: var(--radius-md);
-  padding: var(--sp-3);
-  text-align: left;
-  transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
-}
-
-.use-case-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-.use-case-role {
-  display: block;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: #121214;
-  margin-bottom: 4px;
-}
-
-.use-case-at {
-  font-weight: 500;
+.use-case-tag {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--muted);
   font-size: 0.78rem;
-  color: #8a8a94;
-  margin-left: 4px;
-}
-
-.use-case-role a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.use-case-role a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.use-case-card-lg {
-  grid-column: span 2;
-}
-
-.use-case-desc {
-  color: #5d5d66;
-  font-size: 0.82rem;
-  line-height: 1.4;
-  margin: 0;
+  font-weight: 500;
+  padding: 5px 12px;
+  white-space: nowrap;
 }
 
 /* ── FAQ ─────────────────────────────────────────────── */
@@ -1315,21 +1263,15 @@
   border-color: #dfdfe5;
 }
 
-[data-theme="light"] .testimonial-card {
-  background: linear-gradient(165deg, #ffffff, #f9f9fc);
-  border-color: #d9d9e0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
+[data-theme="light"] .testimonial-card,
 [data-theme="light"] .built-by {
   background: #ffffff;
   border-color: #d9d9e0;
 }
 
-[data-theme="light"] .use-case-card {
-  background: #ffffff;
-  border-color: #e0e0e5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+[data-theme="light"] .use-case-tag {
+  background: #f7f7fa;
+  border-color: #d9d9e0;
 }
 
 [data-theme="light"] .feature-card {
@@ -1506,14 +1448,6 @@
 @media (max-width: 680px) {
   .testimonial-grid {
     grid-template-columns: 1fr;
-  }
-
-  .use-case-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .use-case-card-lg {
-    grid-column: span 2;
   }
 
   .slider { height: 16px; }
