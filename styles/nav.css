@@ -6,6 +6,7 @@
   z-index: 20;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  will-change: transform;
   background: rgba(10, 10, 14, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
@@ -265,13 +266,14 @@
   background: conic-gradient(from 0deg, #ff6b6b, #ffa94d, #ffd43b, #69db7c, #74c0fc, #b197fc, #ff6b6b);
   z-index: -1;
   opacity: 0.5;
-  filter: blur(14px);
+  filter: blur(18px);
+  will-change: transform, opacity;
   animation: halo-pulse 3s ease-in-out infinite;
 }
 
 @keyframes halo-pulse {
-  0%, 100% { opacity: 0.35; filter: blur(14px); transform: scale(1); }
-  50% { opacity: 0.65; filter: blur(20px); transform: scale(1.06); }
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.06); }
 }
 
 .star-badge {
