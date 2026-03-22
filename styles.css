@@ -1242,13 +1242,13 @@ h3,
 
 .feature-track {
   position: relative;
-  width: 420px;
-  height: 520px;
+  width: min(720px, 90vw);
+  height: 640px;
 }
 
 .feature-card {
   position: absolute;
-  width: 420px;
+  width: min(720px, 90vw);
   background: linear-gradient(180deg, var(--surface), var(--surface-2));
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
@@ -1312,6 +1312,7 @@ h3,
   overflow: hidden;
   border-bottom: 1px solid var(--line-soft);
   background: var(--bg);
+  pointer-events: none;
 }
 
 .feature-card-media img {
