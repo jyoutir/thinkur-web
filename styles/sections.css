@@ -1483,40 +1483,35 @@
     border-radius: var(--radius-md);
   }
 
-  /* Feature cards: switch to scroll-snap carousel */
+  /* Feature cards: stack vertically on mobile */
   .feature-carousel {
-    margin: 0 -16px;
+    margin: 0;
   }
 
   .feature-track {
     position: static;
     display: flex;
+    flex-direction: column;
     gap: 12px;
     height: auto;
-    width: auto;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 16px;
-    -webkit-overflow-scrolling: touch;
-    padding: 8px 16px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .feature-track::-webkit-scrollbar {
-    display: none;
+    width: 100%;
+    overflow: visible;
+    padding: 0;
   }
 
   .feature-card {
     position: static;
-    flex: 0 0 calc(100vw - 64px);
-    max-width: none;
+    width: 100%;
+    flex: none;
     transform: none !important;
     opacity: 1 !important;
-    scroll-snap-align: center;
     pointer-events: auto !important;
     cursor: default;
     box-shadow: var(--shadow) !important;
+  }
+
+  .feature-nav {
+    display: none;
   }
 
   .feature-expand-btn {
@@ -1634,10 +1629,6 @@
 /* ── Responsive: 500px ───────────────────────────────── */
 
 @media (max-width: 500px) {
-  .feature-card {
-    flex: 0 0 calc(100vw - 48px);
-  }
-
   .testimonial-card {
     width: 240px;
     min-width: 240px;
