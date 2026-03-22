@@ -1485,9 +1485,7 @@
 
   /* Feature cards: switch to scroll-snap carousel */
   .feature-carousel {
-    width: 100vw;
-    margin-left: -16px;
-    overflow: hidden;
+    margin: 0 -16px;
   }
 
   .feature-track {
@@ -1495,7 +1493,7 @@
     display: flex;
     gap: 12px;
     height: auto;
-    width: 100%;
+    width: auto;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-padding: 16px;
