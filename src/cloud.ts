@@ -271,7 +271,7 @@ export function initCloudBackground(): void {
 
   function loop(time: number): void {
     if (document.hidden) { lastFrame = time; requestAnimationFrame(loop); return; }
-    if (time - lastFrame >= 40) { lastFrame = time; render(time); }
+    if (time - lastFrame >= 100) { lastFrame = time; render(time); }
     requestAnimationFrame(loop);
   }
 
