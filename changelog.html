@@ -91,6 +91,10 @@
                 }
               }
               if (node.tagName === "A") {
+                var href = (node.getAttribute("href") || "").trim().toLowerCase();
+                if (!(href.indexOf("https://") === 0 || href.indexOf("http://") === 0 || href.indexOf("/") === 0)) {
+                  node.removeAttribute("href");
+                }
                 node.setAttribute("target", "_blank");
                 node.setAttribute("rel", "noreferrer");
               }
