@@ -1470,10 +1470,6 @@
     padding-right: 0;
   }
 
-  .demo-video-wrap {
-    aspect-ratio: 16 / 9;
-  }
-
   .features-row {
     grid-template-columns: 1fr;
     max-width: 100%;
@@ -1481,23 +1477,30 @@
     gap: var(--sp-3);
   }
 
+  .demo-video-wrap {
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    border-radius: var(--radius-md);
+  }
+
   /* Feature cards: switch to scroll-snap carousel */
   .feature-carousel {
-    margin: 0 -16px;
-    width: calc(100% + 32px);
+    width: 100vw;
+    margin-left: -16px;
+    overflow: hidden;
   }
 
   .feature-track {
     position: static;
     display: flex;
-    gap: var(--sp-2);
+    gap: 12px;
     height: auto;
     width: 100%;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-padding: 16px;
     -webkit-overflow-scrolling: touch;
-    padding: var(--sp-1) 16px;
+    padding: 8px 16px;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
@@ -1508,8 +1511,8 @@
 
   .feature-card {
     position: static;
-    flex: 0 0 80vw;
-    max-width: 400px;
+    flex: 0 0 calc(100vw - 64px);
+    max-width: none;
     transform: none !important;
     opacity: 1 !important;
     scroll-snap-align: center;
@@ -1520,6 +1523,10 @@
 
   .feature-expand-btn {
     display: none;
+  }
+
+  .feature-close-btn {
+    display: none !important;
   }
 
   .app-track {
@@ -1630,7 +1637,7 @@
 
 @media (max-width: 500px) {
   .feature-card {
-    flex: 0 0 88vw;
+    flex: 0 0 calc(100vw - 48px);
   }
 
   .testimonial-card {
