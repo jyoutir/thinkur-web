@@ -203,7 +203,7 @@ class FeatureCardStack {
   }
 
   private startAuto(): void {
-    if (this.reducedMotion) return;
+    if (this.reducedMotion || this.isExpanded) return;
     this.pauseAuto();
     this.autoTimer = setInterval(() => this.next(), this.AUTO_INTERVAL);
   }
