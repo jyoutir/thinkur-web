@@ -1514,47 +1514,12 @@ function initDemoVideo() {
   video.addEventListener("ended", () => btn.classList.remove("is-hidden"));
 }
 
-function initTabEasterEgg() {
-  const tab = document.querySelector("[data-easter-tab]");
-  if (!tab) return;
-  tab.style.cursor = "pointer";
-  let active = false;
-
-  const phrases = [
-    "Hey, you found the easter egg!",
-    "thinkur turns your voice into text like this.",
-    "No cloud. No subscription. Just your Mac.",
-    "4x faster than typing. Try it.",
-    "This is what dictation feels like.",
-  ];
-
-  tab.addEventListener("click", () => {
-    if (active) return;
-    active = true;
-    tab.style.transform = "scale(0.92)";
-    setTimeout(() => (tab.style.transform = ""), 120);
-
-    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-    const bubble = document.createElement("div");
-    bubble.className = "easter-bubble";
-    bubble.textContent = "";
-    tab.parentElement.appendChild(bubble);
-
-    requestAnimationFrame(() => bubble.classList.add("is-visible"));
-
-    let i = 0;
-    const type = () => {
-      if (i < phrase.length) {
-        bubble.textContent = phrase.slice(0, ++i);
-        setTimeout(type, 28 + Math.random() * 32);
-      } else {
-        setTimeout(() => {
-          bubble.classList.remove("is-visible");
-          setTimeout(() => { bubble.remove(); active = false; }, 300);
-        }, 2000);
-      }
-    };
-    type();
+function initKbdTap() {
+  document.querySelectorAll(".kbd-tap").forEach((kbd) => {
+    kbd.addEventListener("click", () => {
+      kbd.classList.add("is-pressed");
+      setTimeout(() => kbd.classList.remove("is-pressed"), 150);
+    });
   });
 }
 
@@ -1568,5 +1533,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initDemoVideo();
   initCloudBackground();
   initScrollReveal();
-  initTabEasterEgg();
+  initKbdTap();
 });
