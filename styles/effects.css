@@ -1,0 +1,110 @@
+/* ── Cloud canvas ───────────────────────────────────── */
+
+.cloud-canvas {
+  height: 100vh;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  inset: 0;
+  object-fit: cover;
+  opacity: 0.14;
+  pointer-events: none;
+  position: fixed;
+  width: 100vw;
+  z-index: 0;
+}
+
+[data-theme="light"] .cloud-canvas {
+  opacity: 0.10;
+}
+
+/* ── Stacking: content above canvas ─────────────────── */
+
+main,
+.footer {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Film grain overlay ─────────────────────────────── */
+
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  height: 200%;
+  left: -50%;
+  opacity: 0.035;
+  pointer-events: none;
+  position: fixed;
+  top: -50%;
+  width: 200%;
+  z-index: 100;
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+/* ── Scroll reveal ──────────────────────────────────── */
+
+.animate-in {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.animate-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger > *:nth-child(1) { transition-delay: 0.04s; }
+.stagger > *:nth-child(2) { transition-delay: 0.08s; }
+.stagger > *:nth-child(3) { transition-delay: 0.12s; }
+.stagger > *:nth-child(4) { transition-delay: 0.16s; }
+.stagger > *:nth-child(5) { transition-delay: 0.20s; }
+.stagger > *:nth-child(6) { transition-delay: 0.24s; }
+.stagger > *:nth-child(7) { transition-delay: 0.28s; }
+.stagger > *:nth-child(8) { transition-delay: 0.32s; }
+
+/* ── Reduced motion overrides ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay {
+    animation: none;
+  }
+
+  .animate-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .feature-card {
+    transition: none;
+  }
+}
+
+/* ── Short viewport (landscape phones) ──────────────── */
+
+@media (max-height: 700px) and (max-width: 680px) {
+  .demo-window,
+  .window-frame {
+    min-height: 250px;
+  }
+
+  .preview-terminal,
+  .preview-firefox,
+  .preview-messages,
+  .preview-slack,
+  .preview-notes {
+    min-height: 210px;
+  }
+}
