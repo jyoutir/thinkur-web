@@ -1465,6 +1465,11 @@
 /* ── Responsive: 960px ───────────────────────────────── */
 
 @media (max-width: 960px) {
+  .section-features {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .demo-video-wrap {
     aspect-ratio: 16 / 9;
   }
@@ -1472,9 +1477,16 @@
   .features-row {
     grid-template-columns: 1fr;
     max-width: 100%;
+    padding: 0 16px;
+    gap: var(--sp-3);
   }
 
   /* Feature cards: switch to scroll-snap carousel */
+  .feature-carousel {
+    margin: 0 -16px;
+    width: calc(100% + 32px);
+  }
+
   .feature-track {
     position: static;
     display: flex;
@@ -1483,9 +1495,9 @@
     width: 100%;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    scroll-padding: var(--sp-2);
+    scroll-padding: 16px;
     -webkit-overflow-scrolling: touch;
-    padding: var(--sp-1) var(--sp-2);
+    padding: var(--sp-1) 16px;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
@@ -1496,8 +1508,8 @@
 
   .feature-card {
     position: static;
-    flex: 0 0 85vw;
-    max-width: 440px;
+    flex: 0 0 80vw;
+    max-width: 400px;
     transform: none !important;
     opacity: 1 !important;
     scroll-snap-align: center;
@@ -1518,17 +1530,57 @@
 /* ── Responsive: 680px ───────────────────────────────── */
 
 @media (max-width: 680px) {
+  .testimonial-marquee {
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  }
+
   .testimonial-card {
-    width: 300px;
-    min-width: 300px;
+    width: 260px;
+    min-width: 260px;
+    padding: var(--sp-2) var(--sp-2) 14px;
+  }
+
+  .testimonial-text {
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .testimonial-name {
+    font-size: 0.92rem;
+  }
+
+  .testimonial-role {
+    font-size: 0.78rem;
+  }
+
+  .use-cases {
+    padding: 0 16px;
+  }
+
+  .use-cases-title {
+    font-size: 1.15rem;
   }
 
   .use-case-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .use-case-card-lg {
     grid-column: span 2;
+  }
+
+  .use-case-card {
+    padding: 14px;
+  }
+
+  .use-case-role {
+    font-size: 0.88rem;
+  }
+
+  .use-case-desc {
+    font-size: 0.76rem;
   }
 
   .slider { height: 16px; }
@@ -1578,7 +1630,20 @@
 
 @media (max-width: 500px) {
   .feature-card {
-    flex: 0 0 90vw;
+    flex: 0 0 88vw;
+  }
+
+  .testimonial-card {
+    width: 240px;
+    min-width: 240px;
+  }
+
+  .use-case-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .use-case-card-lg {
+    grid-column: span 1;
   }
 
   .app-marquee::before,
