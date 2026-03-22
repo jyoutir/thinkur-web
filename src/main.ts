@@ -13,6 +13,7 @@ import {
   initSavingsCalculator,
   initDownloadButtons,
   initGitHubStars,
+  initGitHubDownloads,
   initAppMarquee,
   initScrollReveal,
   initTabEasterEgg,
@@ -25,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSavingsCalculator();
   initDownloadButtons();
   initGitHubStars();
+  initGitHubDownloads();
   initDemoVideo();
   initCloudBackground();
   initScrollReveal();

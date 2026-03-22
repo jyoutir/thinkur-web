@@ -89,7 +89,6 @@ class FeatureCardStack {
     this.isExpanded = true;
     this.carousel.classList.add("is-expanded");
     this.pauseAuto();
-    document.body.style.overflow = "hidden";
     this.cards.forEach((card) => {
       const img = card.querySelector<HTMLImageElement>("img[data-src]");
       if (img) { img.src = img.dataset.src!; img.removeAttribute("data-src"); }
@@ -100,7 +99,6 @@ class FeatureCardStack {
     if (!this.carousel) return;
     this.isExpanded = false;
     this.carousel.classList.remove("is-expanded");
-    document.body.style.overflow = "";
     this.startAuto();
   }
 
