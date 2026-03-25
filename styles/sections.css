@@ -396,28 +396,8 @@
 }
 
 .testimonial-highlight {
-  background: linear-gradient(165deg, #1a1a2e 0%, #16213e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
   width: 400px;
   min-width: 400px;
-}
-
-.testimonial-highlight .testimonial-text {
-  color: #f0f0f4;
-  font-size: 1rem;
-}
-
-.testimonial-highlight .testimonial-name {
-  color: #ffffff;
-}
-
-.testimonial-highlight .testimonial-role {
-  color: #a0a0b0;
-}
-
-.testimonial-highlight .testimonial-attr {
-  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .testimonial-text {
