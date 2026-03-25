@@ -1010,6 +1010,9 @@
   border-top: 1px solid var(--line-soft);
   margin-top: 6px;
   padding: 28px 24px 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .footer p {
@@ -1028,6 +1031,47 @@
 
 .footer a:hover {
   color: var(--ink);
+}
+
+.ph-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: #ff6154;
+  color: #ffffff;
+  text-decoration: none !important;
+  margin-bottom: 16px;
+  transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
+}
+
+.ph-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 97, 84, 0.3);
+  color: #ffffff;
+}
+
+.ph-badge img {
+  border-radius: 8px;
+}
+
+.ph-badge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.ph-badge-text strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ph-badge-text small {
+  font-size: 0.78rem;
+  opacity: 0.85;
 }
 
 /* ── Early testers section ────────────────────────────── */
